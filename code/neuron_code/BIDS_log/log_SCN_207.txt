@@ -1,0 +1,116 @@
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-SR_run-01_bold (96x96x66x241)
+Conversion required 13.516761 seconds (13.500000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-SR_run-02_bold (96x96x66x241)
+Conversion required 13.655810 seconds (13.640000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-SR_run-03_bold (96x96x66x241)
+Conversion required 14.813642 seconds (13.540000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-SR_run-04_bold (96x96x66x241)
+Conversion required 14.125869 seconds (13.390000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 418 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 418 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-NS_run-01_bold (96x96x66x418)
+Conversion required 24.163790 seconds (24.160000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 458 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 458 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-NS_run-02_bold (96x96x66x458)
+Conversion required 26.786830 seconds (25.570000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 399 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 399 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-NS_run-03_bold (96x96x66x399)
+Conversion required 23.590600 seconds (23.090000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 170 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 170 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-HBN_run-01_bold (96x96x66x170)
+Conversion required 10.365546 seconds (10.310000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Example output filename: 'sub-SCN207_task-HBN_run-02_bold.nii.gz'
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 1 DICOM file(s)
+Warning: interpolated protocol 't1_mpr_sag_p2_iso_0.9' may be unsuitable for dwidenoise/mrdegibbs. /data/neuron/SCN/dicom/SCN_207/20230821-111737.300000/24-t1_mpr_sag_p2_iso_0.9/image000001.dcm
+Warning: Siemens XA DICOM inadequate for robust conversion (issue 236)
+Convert 1 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/anat/sub-SCN207_T1w (512x512x192x1)
+Conversion required 5.059430 seconds (5.050000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 2 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 2 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/fmap/sub-SCN207_dir-ap_epi (96x96x66x2)
+Conversion required 0.114428 seconds (0.100000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 2 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 2 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/fmap/sub-SCN207_dir-pa_epi (96x96x66x2)
+Conversion required 0.110153 seconds (0.100000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-SR_run-01_bold (96x96x66x241)
+Conversion required 13.893683 seconds (13.710000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-SR_run-02_bold (96x96x66x241)
+Conversion required 14.985947 seconds (14.670000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-SR_run-03_bold (96x96x66x241)
+Conversion required 18.014970 seconds (13.880000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-SR_run-04_bold (96x96x66x241)
+Conversion required 14.701344 seconds (13.150000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 418 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 418 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-NS_run-01_bold (96x96x66x418)
+Conversion required 23.316276 seconds (23.309999 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 458 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 458 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-NS_run-02_bold (96x96x66x458)
+Conversion required 27.132011 seconds (24.040001 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 399 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 399 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-NS_run-03_bold (96x96x66x399)
+Conversion required 22.870394 seconds (21.530001 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 170 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 170 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/func/sub-SCN207_task-HBN_run-01_bold (96x96x66x170)
+Conversion required 11.263109 seconds (10.650000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Example output filename: 'sub-SCN207_task-HBN_run-02_bold.nii.gz'
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 1 DICOM file(s)
+Warning: interpolated protocol 't1_mpr_sag_p2_iso_0.9' may be unsuitable for dwidenoise/mrdegibbs. /data/neuron/SCN/dicom/SCN_207/20230821-111737.300000/24-t1_mpr_sag_p2_iso_0.9/image000001.dcm
+Warning: Siemens XA DICOM inadequate for robust conversion (issue 236)
+Convert 1 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/anat/sub-SCN207_T1w (512x512x192x1)
+Conversion required 5.491802 seconds (5.440000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 2 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 2 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/fmap/sub-SCN207_dir-ap_epi (96x96x66x2)
+Conversion required 0.110266 seconds (0.110000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 2 DICOM file(s)
+Warning: Siemens XA exported as classic not enhanced DICOM (issue 236)
+Convert 2 DICOM as /data/neuron/SCN/BIDS/sub-SCN207/fmap/sub-SCN207_dir-pa_epi (96x96x66x2)
+Conversion required 0.135498 seconds (0.100000 for core code).

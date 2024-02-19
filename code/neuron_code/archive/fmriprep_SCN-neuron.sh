@@ -1,0 +1,62 @@
+#!/bin/bash
+
+Sub=sub-SCN$1
+uname=$USER
+BIDS_DIR=/data/neuron/SCN
+
+#
+echo "------------------------------------------------------------------"
+echo "started freesurfer"
+echo ${Sub}
+date
+echo "------------------------------------------------------------------"
+
+
+#recon-all -i $indir/BIDS/${Sub}/anat/${Sub}_T1w.nii.gz -openmp 8 -s ${Sub} -sd $indir/out/freesurfer -all -parallel
+#
+#
+#echo "------------------------------------------------------------------"
+#echo "Ended freesurfer"
+#echo ${Sub}
+#date
+#echo "------------------------------------------------------------------"
+#
+#
+#
+# You can change the 4 lines below, I just like having it time stamp it
+echo "------------------------------------------------------------------"
+echo "Starting fMRIprep at:"
+echo working on ${Sub}
+date
+echo "------------------------------------------------------------------"
+#
+# 
+#
+# export SINGULARITYENV_TEMPLATEFLOW_HOME=/home/aditih/templateflow
+#
+
+singularity run --cleanenv \
+    ${BIDS_DIR}/archive/fmriprep-20.2.6.simg \
+    ${BIDS_DIR}/BIDS ${BIDS_DIR}/fmriprep_out participant \
+    --participant-label ${Sub} \
+    --skull-strip-template MNI152NLin2009cAsym \
+    --output-spaces MNIPediatricAsym:cohort-5:res-2 anat \
+    --use-aroma \
+    --nthreads 8 --n_cpus 6 --omp-nthreads 6 \
+    --mem-mb 24000 \
+    --skip_bids_validation \
+    --no-submm-recon \
+    --notrack \
+    --fs-license-file ${BIDS_DIR}/archive/license.txt
+#
+echo "------------------------------------------------------------------"
+echo "Ended fMRIprep"
+echo ${Sub}
+date
+echo "------------------------------------------------------------------"
+
+# echo start transfering ${Sub} preprocessed data and log file to neuron
+# sh /data/bswift-1/oliver/SCN/code/data_transfer.sh $Sub $indir
+#scp -r "${indir}"/fmriprep/out/fmriprep/"${Sub}" "${indir}"/fmriprep/out/fmriprep/"${Sub}".html "${uname}"@neuron.umd.edu:/data/neuron/SCN/fmriprep_out/fmriprep
+#scp -r "${indir}"/fmriprep/out/freesurfer/"${Sub}" "${uname}"@neuron.umd.edu:/data/neuron/SCN/fmriprep_out/freesurfer
+#scp -r /data/bswift-1/oliver/SCN/log/sub-SCN"$idx".log "${uname}"@neuron.umd.edu:/data/neuron/SCN/fmriprep_out/log/

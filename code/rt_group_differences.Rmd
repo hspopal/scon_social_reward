@@ -1,0 +1,202 @@
+---
+title: "RT Group Differences"
+author: "Haroon Popal"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Set Up
+
+```{r}
+library(ggplot2)
+library(readr)
+library(stringr)
+library(patchwork)
+```
+
+### Set paths
+```{r}
+knitr::opts_knit$set(root.dir = '/Users/hpopal/Google Drive/My Drive/dscn_lab/projects/social_reward/')
+
+proj_dir <- '/Users/hpopal/Google Drive/My Drive/dscn_lab/projects/social_reward/'
+data_dir <- paste(proj_dir ,'derivatives/task_socialreward/data/', sep='')
+```
+
+### Find participants
+```{r, message=FALSE}
+# Import participant ID data
+subj_df <- read_tsv(paste(proj_dir,'participants.tsv', sep = ''))
+
+# Fix participant IDs to match the directories in the data folder (e.g. sub-SCN101 -> SCN_101)
+
+# Create function to get the subj numeric ID
+get_subj_num <- function(subj_name){
+  subj_num <- substr(subj_name, nchar(subj_name)-2, nchar(subj_name))
+  paste('SCN_',subj_num, sep = '')
+}
+
+subj_df$participant_id <- lapply(subj_df$participant_id, get_subj_num)
+
+
+print(paste('Found ',nrow(subj_df),' participants'))
+```
+
+
+# Data Cleaning
+```{r}
+rt_data <- data.frame(matrix(ncol=4, nrow=0))
+colnames(rt_data) <- c('ParticipantID','Run',
+                       'ConditionName','Correct_RT')
+
+# Import data
+for (subj in subj_df$participant_id) {
+  # Find data for all runs
+  run_files <- list.files(path=paste(data_dir,subj,'/', sep = ''), pattern="*\\-errors.csv", full.names=TRUE, recursive=TRUE)
+  
+  # Loop through runs and combine in to one df
+  for (run_file in run_files) {
+    temp_run_data <- read.csv(run_file)
+    if (sum(temp_run_data$redcap_v_task) > 0) {
+      next
+    } else {
+      temp_run_data_fltr <- temp_run_data[,which((names(temp_run_data) %in% names(rt_data))==TRUE)]
+      rt_data <- rbind(rt_data, temp_run_data_fltr)
+    }
+  }
+  
+}
+
+# Convert RTs to numeric type
+rt_data$Correct_RT <- as.numeric(rt_data$Correct_RT)
+
+```
+
+```{r}
+# Add group into to rt data
+rt_data$group <- subj_df[match(rt_data$ParticipantID, subj_df$participant_id), 'group']
+```
+
+```{r}
+# Create column for peer condition info
+rt_data$Peer <- factor(sapply(list(rt_data$ConditionName),
+                       str_split_i, pattern='_', i=2))
+```
+
+## Find number of missed trials
+```{r}
+sum(is.na(rt_data$Correct_RT))
+```
+Across all trials for all participants, there were 97 missed trials.
+
+
+
+# Reaction Time Analyses
+
+## Reaction time distribution
+```{r}
+ggplot(rt_data, aes(x=Correct_RT, fill=Peer)) + 
+  geom_histogram(position='identity', alpha=0.5)
+```
+
+## Condition Means
+```{r}
+ggplot(data=rt_data, aes(x=Peer, y=Correct_RT)) +
+  geom_bar(stat = 'summary', fun = 'mean') 
+```
+
+```{r}
+model1 <- lm(Correct_RT ~ Peer, data=rt_data)
+
+summary(model1)
+```
+
+
+```{r}
+contr.treatment(3, base=3)
+```
+
+```{r}
+# Create contrast
+contrasts(rt_data$Peer) = contr.treatment(3, base=3)
+
+model1 <- lm(Correct_RT ~ Peer, data=rt_data)
+
+summary(model1)
+```
+Peer1 = Computer, Peer2 = DisPeer?
+
+
+## Condition Means by Run
+
+```{r}
+ggplot(rt_data) + 
+  geom_density(aes(x = Correct_RT, fill = Peer), alpha=0.5) + 
+  facet_grid(rows = vars(Run))
+```
+
+
+### Contrast run 1 and 4 for each peer condition
+```{r}
+matrix(c(1,0,0,-1,0,0,0,0,0,0,0,0), ncol=3)
+```
+
+```{r}
+contrasts_peer = contrasts(rt_data$Peer)
+contrasts_peer[,1] = c(1,0,0)
+contrasts_peer[,2] = c(0,1,0)
+
+contrasts_run = contrasts(factor(rt_data$Run))
+contrasts_run[,1] = c(1,0,0,-1)
+contrasts_run[,2] = c(0,0,0,0)
+contrasts_run[,3] = c(0,0,0,0)
+
+model2 <- lm(Correct_RT ~ Peer*factor(Run), data=rt_data)
+
+summary(model2)
+
+```
+
+
+# Group Differences
+
+```{r}
+p1 <- ggplot(rt_data[rt_data$group$group == 1,]) + 
+      geom_density(aes(x = Correct_RT, fill = Peer), alpha=0.5) + 
+      facet_grid(rows = vars(Run)) + 
+      ggtitle('Not ASD') + 
+      theme(plot.title = element_text(hjust = 0.5), legend.position="none") + 
+      ylim(0, 2.5)
+p2 <- ggplot(rt_data[rt_data$group$group == 2,]) + 
+      geom_density(aes(x = Correct_RT, fill = Peer), alpha=0.5) + 
+      facet_grid(rows = vars(Run)) + 
+      ggtitle('ASD') + 
+      theme(plot.title = element_text(hjust = 0.5), axis.title.y = element_blank()) + 
+      ylim(0, 2.5)
+
+p1 + p2
+```
+
+```{r}
+model3 <- lm(Correct_RT ~ Peer + Run + group$group, data=rt_data)
+
+summary(model3)
+```
+
+```{r}
+ggplot(data=rt_data, aes(x=Peer, y=Correct_RT, fill=factor(Run), alpha=factor(group$group))) +
+  geom_bar(stat = 'summary', fun = 'mean',
+           position='dodge') + 
+  scale_fill_discrete(name = "Run") + 
+  scale_alpha_discrete(name = "Group", labels = c('Not ASD', 'ASD')) + 
+  scale_alpha_manual(values=c(0.3,1))
+```
+
+
+# Next Steps?
+Consider runs as longitudinal data and look at the rate of change of RT as a function of peer condition. Question: Do participants get faster reaction times over runs for similar peers compared to dissimilar peers?
+
+

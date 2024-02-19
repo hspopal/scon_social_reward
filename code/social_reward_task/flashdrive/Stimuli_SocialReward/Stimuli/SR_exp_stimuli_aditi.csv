@@ -1,0 +1,212 @@
+﻿ItemNumber,ItemText,Reward,Value,ITI,ISI,Order,peerName(dis/comp/sim),TrialType,Condition
+57.0,Like olives,0,1,2.89574938,3.3001174,[0 2 1 3],Shiloh,LowReward_Computer,1
+146,Like snow,1,2,4.50954738,3.78498759,,Computer,HighReward_SimPeer,5
+43,Like gardening,0,0,4.21660991,5.2510385,,Charlie,LowReward_DisPeer,0
+150.0,A good student,0,2,2.96670213,4.11625244,,,LowReward_SimPeer,2
+75.0,Like drawing,0,1,2.87744482,4.90631713,,,LowReward_Computer,1
+118.0,Like writing stories,1,1,2.16481546,2.18493623,,,HighReward_Computer,4
+163,Like aquariums,1,2,3.70670778,3.27894391,,,HighReward_SimPeer,5
+184,Like English class,0,0,4.30827291,4.43948955,,,LowReward_DisPeer,0
+108.0,Don't like fast food,0,1,4.17352776,2.59586552,,,LowReward_Computer,1
+201.0,Have a job,0,2,5.17467788,5.63903232,,,LowReward_SimPeer,2
+42.0,Can't whistle,0,0,2.31457256,4.74747725,,,LowReward_DisPeer,0
+96.0,Like history,0,1,3.68079601,2.44040091,,,LowReward_Computer,1
+38,Like jigsaw puzzles,0,0,2.41152071,3.72057725,,,LowReward_DisPeer,0
+51.0,Like roller coasters,1,1,2.97002015,2.58073647,,,HighReward_Computer,4
+199.0,Not religious,1,1,3.59487236,5.32863316,,,HighReward_Computer,4
+135.0,Don't like thrift shopping,1,2,4.06008363,4.53708523,,,HighReward_SimPeer,5
+182,Like arts and crafts,0,0,3.10683953,2.18326427,,,LowReward_DisPeer,0
+7.0,Like napping,1,1,4.30517123,2.27396965,,,HighReward_Computer,4
+41,Nerdy,1,2,3.25221501,2.94294743,,,HighReward_SimPeer,5
+157.0,Like decorating room,1,0,2.59828545,2.70465329,,,HighReward_DisPeer,3
+85,Like science class,1,2,2.92222314,3.08456917,,,HighReward_SimPeer,5
+11.0,Don't speak Spanish,1,2,4.30517123,2.63915871,,,HighReward_SimPeer,5
+116.0,Like sleepovers,1,0,4.96787029,4.55358093,,,HighReward_DisPeer,3
+136.0,Don't like computer games,0,0,2.88925715,2.67102637,,,LowReward_DisPeer,0
+12.0,Don't like scrap booking,1,0,2.18287147,2.01304355,,,HighReward_DisPeer,3
+101.0,Like making videos,0,1,4.77758825,2.8914405,,,LowReward_Computer,1
+131,Like animated films,1,2,3.09472349,2.1020608,,,HighReward_SimPeer,5
+180.0,Like friends,1,1,2.2259827999999997,2.07696656,,,HighReward_Computer,4
+114.0,Don't like football,1,1,5.7103379,5.2510385,,,HighReward_Computer,4
+4,Like short stories,1,2,5.675675900000001,2.59924637,,,HighReward_SimPeer,5
+99,Like board games,0,0,4.47041039,2.17051165,,,LowReward_DisPeer,0
+139.0,Like storms,1,0,2.02114927,3.17104138,,,HighReward_DisPeer,3
+50,Like Starbucks,0,0,3.37250932,5.25844965,,,LowReward_DisPeer,0
+78.0,Don't like yard sales,1,2,2.45788803,2.83304288,,,HighReward_SimPeer,5
+21,Like eating out,1,2,3.23367388,4.6686372,,,HighReward_SimPeer,5
+94.0,Like cookies,1,1,5.7103379,4.53708523,,,HighReward_Computer,4
+148.0,Like family,1,1,4.17352776,5.02618908,,,HighReward_Computer,4
+121.0,Don't like whistling,0,0,2.97002015,2.27396965,,,LowReward_DisPeer,0
+92.0,Don't like baseball,0,1,3.8622209,3.29080807,,,LowReward_Computer,1
+65,Like watching sunsets,1,2,4.07462175,3.08097809,,,HighReward_SimPeer,5
+76.0,Don't like reality TV,0,2,5.675675900000001,4.6686372,,,LowReward_SimPeer,2
+39,Weird,0,0,3.62274525,2.33254142,,,LowReward_DisPeer,0
+1.0,An animal lover,0,1,2.63538796,3.77058908,,,LowReward_Computer,1
+191,Like ballet,0,0,3.14557806,4.18499017,,,LowReward_DisPeer,0
+62.0,Not a runner,0,0,3.34321393,5.05217585,,,LowReward_DisPeer,0
+167.0,Like babysitting,0,2,2.78302938,4.72127217,,,LowReward_SimPeer,2
+204.0,Not a vegetarian,1,2,2.82085991,2.26130179,,,HighReward_SimPeer,5
+193.0,Like lunch time,0,1,3.88952643,2.63915871,,,LowReward_Computer,1
+173.0,An activist,0,2,3.88952643,2.70465329,,,LowReward_SimPeer,2
+72,Like politics,0,0,3.16073762,3.13894615,,,LowReward_DisPeer,0
+37,Like dogs,1,2,2.21104358,2.40319659,,,HighReward_SimPeer,5
+10,Like reading,0,0,2.35528871,2.44236417,,,LowReward_DisPeer,0
+48.0,Don't like bowling,0,0,3.23367388,5.02618908,,,LowReward_DisPeer,0
+145.0,Don't like bugs,1,1,2.63828777,2.23847502,,,HighReward_Computer,4
+34.0,Like broccoli,1,0,5.81972697,2.06623717,,,HighReward_DisPeer,3
+27,Like science fiction,1,2,2.02333141,2.61273908,,,HighReward_SimPeer,5
+67.0,Like juice,1,1,3.25221501,2.06785812,,,HighReward_Computer,4
+29,A reader,0,0,4.55889033,4.119203700000001,,,LowReward_DisPeer,0
+44.0,Don't like sports,1,2,2.90862819,4.23469258,,,HighReward_SimPeer,5
+122,Like cooking,1,2,2.87061115,2.07569032,,,HighReward_SimPeer,5
+32,Disorganized,1,2,5.17467788,3.54719571,,,HighReward_SimPeer,5
+45.0,Don't like playing clarinet,1,0,2.13090185,2.7912828999999997,,,HighReward_DisPeer,3
+208.0,Like libraries,1,1,3.41043318,4.03426325,,,HighReward_Computer,4
+196.0,Don't like malls,0,2,5.52117041,5.04715685,,,LowReward_SimPeer,2
+194.0,Not a vegan,1,1,3.15107181,5.25844965,,,HighReward_Computer,4
+90.0,Don't like playing chess,0,1,3.95359469,3.02473198,,,LowReward_Computer,1
+14,Like painting,0,0,3.98542573,3.39866865,,,LowReward_DisPeer,0
+126.0,Like listening to music,0,1,3.71897472,5.28319978,,,LowReward_Computer,1
+89.0,Stand up for others,0,1,5.06270638,2.05526199,,,LowReward_Computer,1
+149.0,Don't like celebrities,0,1,3.28456772,4.71938732,,,LowReward_Computer,1
+112.0,Don't like watching sports,1,2,5.24492236,5.63903232,,,HighReward_SimPeer,5
+104.0,Don't like barbeques,0,0,2.84837858,2.5917946,,,LowReward_DisPeer,0
+73.0,Like being with friends,1,0,2.05113024,3.35300733,,,HighReward_DisPeer,3
+71,Like Netflix,1,2,4.53116207,5.50292284,,,HighReward_SimPeer,5
+117,Like podcasts,1,2,3.11839839,4.6665532999999995,,,HighReward_SimPeer,5
+127.0,Like daydreaming,0,1,5.65166483,3.44856076,,,LowReward_Computer,1
+16.0,Like ice skating,1,1,5.09778164,2.77091905,,,HighReward_Computer,4
+79.0,Don't like rap,1,2,2.19615082,2.37126377,,,HighReward_SimPeer,5
+154.0,Like musicals,1,1,4.95213315,5.9734947,,,HighReward_Computer,4
+113.0,Like phone calls,1,0,3.82019733,5.69189423,,,HighReward_DisPeer,3
+77,Like cooking shows,1,2,2.87061115,2.18493623,,,HighReward_SimPeer,5
+30,Loud,0,0,4.61501288,2.56000528,,,LowReward_DisPeer,0
+123,Like sushi,0,0,5.24492236,2.94294743,,,LowReward_DisPeer,0
+55.0,Don't like soccer,0,0,3.33229666,2.97550552,,,LowReward_DisPeer,0
+211.0,Like candy,0,2,2.77628335,4.14247651,,,LowReward_SimPeer,2
+22.0,Like Halloween,0,1,2.37941659,4.23469258,,,LowReward_Computer,1
+132.0,Don't like game streaming,1,1,2.37376117,3.15125435,,,HighReward_Computer,4
+195.0,Not popular,0,1,3.3251220999999997,2.09864808,,,LowReward_Computer,1
+35,Like cartoons,1,2,3.2072655,2.00073031,,,HighReward_SimPeer,5
+120,Like coffee,0,0,3.59675378,3.67911175,,,LowReward_DisPeer,0
+161.0,Like shopping online,0,2,3.49133083,4.03426325,,,LowReward_SimPeer,2
+159,Like arguing,0,0,3.89786081,3.74844444,,,LowReward_DisPeer,0
+98.0,Don't like writing poems,1,2,3.15107181,2.8914405,,,HighReward_SimPeer,5
+87.0,Like summer,1,1,2.16481546,4.119203700000001,,,HighReward_Computer,4
+141.0,Don't like playing sports,0,0,4.815747099999999,4.48172236,,,LowReward_DisPeer,0
+66.0,Like school,0,1,2.23052651,2.87625004,,,LowReward_Computer,1
+,,,,2.2259827999999997,2.83304288,,,,
+,,,,2.18287147,4.43948955,,,,
+,,,,4.06008363,4.00998361,,,,
+,,,,4.96787029,2.67061368,,,,
+,,,,3.98542573,2.58073647,,,,
+,,,,2.21112071,2.85974911,,,,
+,,,,2.4937386000000004,5.97226471,,,,
+,,,,2.45788803,2.07569032,,,,
+,,,,4.77758825,4.55358093,,,,
+,,,,3.41043318,3.54719571,,,,
+,,,,2.07344949,2.80712023,,,,
+,,,,2.74641674,3.92646868,,,,
+,,,,5.41466813,5.53797127,,,,
+,,,,5.08216659,5.91210767,,,,
+,,,,2.90862819,2.59586552,,,,
+,,,,4.30827291,4.00998361,,,,
+,,,,3.85682004,3.25862118,,,,
+,,,,3.71897472,2.67061368,,,,
+,,,,2.218327,3.18239803,,,,
+,,,,2.42435333,2.92967945,,,,
+,,,,3.34209727,2.46178537,,,,
+,,,,2.34388672,5.86917418,,,,
+,,,,4.27381241,2.41198462,,,,
+,,,,5.51467427,3.61811304,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
