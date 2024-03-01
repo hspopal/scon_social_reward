@@ -33,6 +33,7 @@ Help()
     echo "-f    Run fmriprep preprocessing"
     echo "-r    Rerun fmriprep for a particular participant"
     echo "-a    Rerun the entire pipeline for a particular participant, from downloading data from MNC to fmriprep"
+    echo "-t    Transfer fmriprep, freesurfer, and log data from bswift to neuron"
     echo "-h    Print this help"
 }
 ##########################################################################
@@ -42,8 +43,9 @@ dicom_download=false
 convert_niftis=false
 run_fmriprep=false
 rerun_fmriprep=false
+transfer_bswift2neuron=false
 
-while getopts "s:dnfrah" opt; do
+while getopts "s:dnfrath" opt; do
 	case $opt in 
         s) # Provide subject ID
             subID=${OPTARG};;
@@ -61,6 +63,8 @@ while getopts "s:dnfrah" opt; do
             dicom_download=true;
             convert_niftis=true;
             rerun_fmriprep=true;;
+        t) # Transfer data from bswift to neuron
+            transfer_bswift2neuron=true;;
         h) # Display Help
             Help
             exit;;
@@ -199,4 +203,20 @@ then
     fi
 fi
 
+
+
+# Transfer data from bswift to neuron
+cd ${proj_dir}
+
+if $transfer_bswift2neuron
+then
+    BID_ID=sub-SCN$subID
+    indir=/data/bswift-1/"${uname}"/SCN 
+
+    ssh ${uname}@login.bswift.umd.edu "sh /data/bswift-1/oliver/SCN/code/data_transfer.sh "$BID_ID" "$indir"" 
+
+    # Change permissions to fmriprep files so everyone can edit
+    chgrp -R psyc-dscn-data ${proj_dir}/fmriprep_out/fmriprep/$BID_ID
+    chmod -R 775 ${proj_dir}/fmriprep_out/fmriprep/$BID_ID
+fi
 
