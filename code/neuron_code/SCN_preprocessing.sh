@@ -14,8 +14,8 @@
 # Prerequisite scripts:
 # 1. BidsConvert_SCN.sh - should be in the preprocessing_code directory
 # 2. BidsConvertParameters_SCN.sh - same as above
-# 3. fmriprep_SCN-hpopal.sh - should be in YOUR "code" directory on bswift
-# (e.g. /data/bswift-1/hpopal/SCN/code/fmriprep_SCN-hpopal.sh)
+# 3. fmriprep_SCN.sh - should be in YOUR "code" directory on bswift
+# (e.g. /data/bswift-1/hpopal/SCN/code/fmriprep_SCN.sh)
 #
 ##########################################################################
 
@@ -180,7 +180,7 @@ then
         echo ------------------------
 
         # Submit fmriprep sbatch on bswift
-        ssh ${uname}@login.bswift.umd.edu "sbatch --export=indir="$SCN_bswift",uname="$uname",subID="$subID" --job-name=SCN"$subID" --mail-user="${uname}"@umd.edu --output="$SCN_bswift"/log/sub-SCN"$subID".log /data/bswift-1/hpopal/SCN/code/fmriprep_SCN-hpopal.sh"
+        ssh ${uname}@login.bswift.umd.edu "sbatch --export=indir="$SCN_bswift",uname="$uname",subID="$subID" --job-name=SCN"$subID" --mail-user="${uname}"@umd.edu --output="$SCN_bswift"/log/sub-SCN"$subID".log /data/bswift-1/hpopal/SCN/code/fmriprep_SCN.sh"
 
 
     elif $rerun_fmriprep
@@ -194,7 +194,7 @@ then
         echo ------------------------
 
         # Submit fmriprep sbatch on bswift
-        ssh ${uname}@login.bswift.umd.edu "sbatch --export=indir="$SCN_bswift",uname="$uname",subID="$subID" --job-name=SCN"$subID" --mail-user="${uname}"@umd.edu --output="$SCN_bswift"/log/sub-SCN"$subID".log /data/bswift-1/hpopal/SCN/code/fmriprep_SCN-hpopal.sh"
+        ssh ${uname}@login.bswift.umd.edu "sbatch --export=indir="$SCN_bswift",uname="$uname",subID="$subID" --job-name=SCN"$subID" --mail-user="${uname}"@umd.edu --output="$SCN_bswift"/log/sub-SCN"$subID".log /data/bswift-1/hpopal/SCN/code/fmriprep_SCN.sh"
     
     else
         echo ------------------------

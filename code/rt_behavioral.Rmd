@@ -1,8 +1,19 @@
 ---
 title: "Reaction Time Analyses - Jones"
-author: "Haroon Popal"
+author: "Author: Haroon Popal"
 date: "`r Sys.Date()`"
-output: html_document
+output:   
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    df_print: paged
+    css: !expr here::here("code/style.css")
+knit: (function(inputFile, encoding) { 
+      out_dir <- 'rt_behavioral/';
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_file=file.path(dirname(inputFile), out_dir, 'index.html')) })
 ---
 
 ```{r, setup, include=FALSE}
@@ -14,14 +25,17 @@ knitr::opts_knit$set(root.dir = proj_dir)
 ## Setup Up
 
 ### Import Packages
-```{r}
+```{r, include=FALSE}
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(emmeans)
+library(lmerTest)
+
 ```
 
 ### Define directories
-````{r}
+```{r}
 data_dir <- 'derivatives/task_socialreward/data/'
 ```
 
@@ -84,7 +98,7 @@ head(rt_data)
 
 
 ## Missed trials
-When a participant did not press the correct button, the feedback was "no data". This occured in two instances:
+When a participant did not press the correct button, the feedback was "no data". This occurred in two instances:
 - When the participant made no button press
 - When the participant hit the incorrect button, and did not hit the correct button before the trial timed out
 In both these instances, the participant was not paying attention and so we should exclude these trials. If this was the case for more than 20% of the run, then we should exclude data from the entire run.
@@ -126,15 +140,20 @@ for (i in 1:nrow(exclude_subj_runs)) {
 
 ```
 
-
-
-
-## Check Assumptions
-
-### Normality
+Create column for missing trials
 ```{r}
-ggplot(rt_data, aes(x=Correct_RT)) + geom_histogram() + theme_classic()
+rt_data$accuracy <- 1
+rt_data[is.na(rt_data$Correct_RT),'accuracy'] <- 0
 ```
+
+
+Turn run into a categorical variable
+```{r}
+rt_data$Run.f <- factor(rt_data$Run)
+```
+
+
+## Transforming Data
 
 Using method from [Jones et al., 2014](https://pubmed.ncbi.nlm.nih.gov/24550063/):
 "Reaction times to the cue after the wink occurred were z-score transformed to each individual’s mean and standard deviation after first removing outliers (defined as reaction times 3 standard deviations above or below the individual’s mean reaction time) and log transforming each reaction time to satisfy normality assumptions."
@@ -154,23 +173,33 @@ rt_data_mod$Correct_RT_logz <- NA
 
 for (subj in subj_df$participant_id) {
 # Calculate mean and SD
-  temp_subj_data <- filter(rt_data_mod, ParticipantID == subj)
+  temp_subj_data <- filter(rt_data_mod, participant_id == subj)
   temp_mean <- mean(temp_subj_data$Correct_RT_log, na.rm = TRUE)
   temp_sd <- sd(temp_subj_data$Correct_RT_log, na.rm = TRUE)
-  rt_data_mod[(rt_data_mod$ParticipantID %in% subj),'Correct_RT_logz'] <- (rt_data_mod[(rt_data_mod$ParticipantID %in% subj),'Correct_RT_log'] - temp_mean)/temp_sd
+  rt_data_mod[(rt_data_mod$participant_id %in% subj),'Correct_RT_logz'] <- (rt_data_mod[(rt_data_mod$participant_id %in% subj),'Correct_RT_log'] - temp_mean)/temp_sd
 }
 
+```
 
-ggplot(rt_data_mod, aes(x=Correct_RT_logz)) + geom_histogram() + theme_classic()
+```{r}
+require(gridExtra)
+plot1 <- ggplot(rt_data_mod, aes(x=Correct_RT)) + geom_histogram() + theme_classic()
+
+plot2 <- ggplot(rt_data_mod, aes(x=Correct_RT_logz)) + geom_histogram() + theme_classic()
+
+grid.arrange(plot1, plot2, ncol=2)
+
 ```
 
 
 
-# Reaction Time Main Effects
+# Behavioral Analyses
 
 ## Run and Reaction Time
+Use a linear mixed-effects model to model both the fixed effects of our conditions of interest, and the random effects of the participants. An example would be that some participants are just faster to respond in all conditions. 
 ```{r}
-model_run <- lm(Correct_RT_logz ~ Run, data = rt_data_mod)
+model_run <- lmer(Correct_RT_logz ~ Run + (1 + Run | participant_id), 
+                data = rt_data_mod)
 summary(model_run)
 ```
 
@@ -184,7 +213,8 @@ ggplot(data = rt_data_mod, aes(x=Run, y=Correct_RT_logz, group=Run)) +
 
 ## Peer Category and Run Predicting Reaction Time
 ```{r}
-model_run_peer <- lm(Correct_RT_logz ~ Run*Condition, data = rt_data_mod)
+model_run_peer <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run | participant_id),
+                       data = rt_data_mod)
 summary(model_run_peer)
 ```
 
@@ -203,13 +233,20 @@ ggplot(data = rt_data_mod, aes(x=Condition, y=Correct_RT_logz, fill=factor(Run))
 ## Non-Autistic
 ```{r}
 rt_data_mod_typ <- filter(rt_data_mod, group == 'non-autistic')
-head(rt_data_mod_typ)
+print(paste("There are ",length(unique(rt_data_mod_typ$participant_id)), 
+            " non-autistic participants"))
 ```
 
 ```{r}
-model_run_peer_typ <- lm(Correct_RT_logz ~ Run*Condition, data = rt_data_mod_typ)
+model_run_peer_typ <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run | participant_id ), data = rt_data_mod_typ)
 summary(model_run_peer_typ)
 ```
+
+```{r}
+m.lst <- emtrends(model_run_peer_typ, "Condition", var="Run")
+pairs(m.lst)
+```
+
 
 ```{r}
 ggplot(data = rt_data_mod_typ, aes(x=Condition, y=Correct_RT_logz, fill=factor(Run))) + 
@@ -224,16 +261,23 @@ ggplot(data = rt_data_mod_typ, aes(x=Condition, y=Correct_RT_logz, fill=factor(R
 ## Autistic
 ```{r}
 rt_data_mod_asd <- filter(rt_data_mod, group == 'autistic')
-print(length(rt_data_mod_asd$ParticipantID))
+print(paste("There are ",length(unique(rt_data_mod_asd$participant_id)), 
+            " autistic participants"))
 ```
 
 ```{r}
-model_run_peer_asd <- lm(Correct_RT_logz ~ Run*Condition, data = rt_data_mod_asd)
+model_run_peer_asd <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run | participant_id), data = rt_data_mod_asd)
 summary(model_run_peer_asd)
 ```
 
 ```{r}
-ggplot(data = model_run_peer_asd, aes(x=Condition, y=Correct_RT_logz, fill=factor(Run))) + 
+m.lst <- emtrends(model_run_peer_asd, "Condition", var="Run")
+pairs(m.lst)
+```
+
+
+```{r}
+ggplot(data = rt_data_mod_asd, aes(x=Condition, y=Correct_RT_logz, fill=factor(Run))) + 
   geom_boxplot(outlier.shape = NA) + 
   geom_point(alpha=0.05, aes(fill=factor(Run)),
              position = position_jitterdodge(dodge.width = 0.8)) +
@@ -241,12 +285,25 @@ ggplot(data = model_run_peer_asd, aes(x=Condition, y=Correct_RT_logz, fill=facto
 ```
 
 
+## Autistic vs Non-Autistic
+```{r}
+model_run_peer_group <- lmer(Correct_RT_logz ~ Run*Condition*group + (1 + Run | participant_id),
+                       data = rt_data_mod)
+summary(model_run_peer_group)
+```
 
-# Reinforcement Learning Model
-Using a Rescorla–Wagner model to model the trial-by-trial variance in participants’ reaction times. Use separate learning rates for positive and negative feedback.
-
-## Define functions
 
 
+```{r}
+m.lst <- emtrends(model_run_peer_group, "Condition", var="Run")
+pairs(m.lst)
+```
 
 
+```{r}
+ggplot(data = rt_data_mod_asd, aes(x=Condition, y=Correct_RT_logz, fill=factor(Run))) + 
+  geom_boxplot(outlier.shape = NA) + 
+  geom_point(alpha=0.05, aes(fill=factor(Run)),
+             position = position_jitterdodge(dodge.width = 0.8)) +
+  theme_classic()
+```
