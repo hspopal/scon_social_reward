@@ -9,11 +9,7 @@ output:
     toc_depth: 2
     df_print: paged
     css: !expr here::here("code/style.css")
-knit: (function(inputFile, encoding) { 
-      out_dir <- 'rt_behavioral';
-      rmarkdown::render(inputFile,
-                        encoding=encoding, 
-                        output_file=file.path(dirname(inputFile), out_dir, 'index.html')) })
+
 ---
 
 ```{r, setup, include=FALSE}
