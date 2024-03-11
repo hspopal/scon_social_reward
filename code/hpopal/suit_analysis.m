@@ -10,19 +10,20 @@ this script.
 %}
 
 %% Add paths
-% addpath('/software/neuron/SPM/spm12')
+addpath('/software/neuron/SPM/spm12')
 
-spm
+spm;
 
-
+%%
 bids_dir = '/data/neuron/SCN/SR/';
+data_dir = strcat(bids_dir,'derivatives/SR_univariate/');
 %suit_dir = strcat(bids_dir, 'derivatives/suit/');
 
 
 
 %% Set variables
 
-subj_list=( 'sub-SCN101', 'sub-SCN102', 'sub-SCN103', 'sub-SCN104', ...
+subj_list = {'sub-SCN101', 'sub-SCN102', 'sub-SCN103', 'sub-SCN104', ...
             'sub-SCN105', 'sub-SCN106', 'sub-SCN107', 'sub-SCN108', ...
             'sub-SCN109', 'sub-SCN110'  'sub-SCN112', 'sub-SCN113', ...
             'sub-SCN117', 'sub-SCN118', 'sub-SCN119', 'sub-SCN120', ...
@@ -43,14 +44,11 @@ subj_list=( 'sub-SCN101', 'sub-SCN102', 'sub-SCN103', 'sub-SCN104', ...
             'sub-SCN207', 'sub-SCN208', 'sub-SCN209', 'sub-SCN210', ...
             'sub-SCN215', 'sub-SCN216', 'sub-SCN218', 'sub-SCN219', ...
             'sub-SCN222', 'sub-SCN223', 'sub-SCN225', 'sub-SCN227', ...
-            'sub-SCN234' )
+            'sub-SCN234'};
 %subj_list = char(subj_list);
 
 tasks = {'SR'};
-conditions = {'positive_run-1','positive_win_run-1','positive_loss_run-1',...
-              'negative_run-1','negative_win_run-1','negative_loss_run-1',...
-              'positive_run-2','positive_win_run-2','positive_loss_run-2',...
-              'negative_run-2','negative_win_run-2','negative_loss_run-2'};
+
 
 %% For loop
 for i = 1:length(subj_list)
@@ -58,11 +56,11 @@ for i = 1:length(subj_list)
     % Isolate cerebellum and brainstem
 
     % Set paths and file prefix
-    suit_dir = strcat(bids_dir, 'derivatives/SR_univariate/',subj,'/suit/');
+    suit_dir = strcat(data_dir,subj,'/suit/');
     
     cd(suit_dir);
 
-    subj_t1_prefix = strcat(subj,'_run-1_space-MNI152NLin2009cAsym');
+    subj_t1_prefix = strcat(subj,'_space-MNIPediatricAsym_cohort-5_res-2');
 
 
     % Isolate cerebellum and brainstem
@@ -84,43 +82,37 @@ for i = 1:length(subj_list)
     end
     
 
+    % Find functional maps
+    fileList = dir(strcat(data_dir,subj,'/','zmap*.nii'));
+
     
     % Map funcitonal data to new space
     for i_task = 1:length(tasks)
         task = tasks{i_task};
         
-        for i_cond = 1:length(conditions)
-            condition = conditions{i_cond};
+        for i_cond = 1:length(fileList)
             
-            % Check to see if tmap exists
-            if isfile(strcat(suit_dir,'../zmap_',task, ...
-                                '_',condition,'.nii'))
-                job.subj.affineTr = {strcat('Affine_', subj, ...
-                    '_run-1_space-MNI152NLin2009cAsym_label-GM_probseg.mat')};
-                job.subj.flowfield = {strcat('u_a_', subj, ...
-                    '_run-1_space-MNI152NLin2009cAsym_label-GM_probseg.nii')};
-                job.subj.resample = {strcat(suit_dir,'../zmap_',task, ...
-                                    '_',condition,'.nii')};
-                job.subj.mask = {strcat('c_', subj, ...
-                    '_run-1_space-MNI152NLin2009cAsym_desc-preproc_T1w_pcereb.nii')};
+            job.subj.affineTr = {strcat('Affine_', subj, ...
+                '_space-MNIPediatricAsym_cohort-5_res-2_label-GM_probseg.mat')};
+            job.subj.flowfield = {strcat('u_a_', subj, ...
+                '_space-MNIPediatricAsym_cohort-5_res-2_label-GM_probseg.nii')};
+            job.subj.resample = {strcat(suit_dir,'../',fileList(i_cond).name)};
+            job.subj.mask = {strcat('c_', subj, ...
+                '_space-MNIPediatricAsym_cohort-5_res-2_desc-preproc_T1w_pcereb.nii')};
 
-                suit_reslice_dartel(job)
+            suit_reslice_dartel(job)
 
-                % Put data from SUIT space to native space
-                job.Affine = {strcat('Affine_', subj, ...
-                    '_run-1_space-MNI152NLin2009cAsym_label-GM_probseg.mat')};
-                job.flowfield = {strcat('u_a_', subj, ...
-                    '_run-1_space-MNI152NLin2009cAsym_label-GM_probseg.nii')};
-                job.resample = {strcat(suit_dir,'../zmap_',task, ...
-                    '_',condition,'.nii')};
-                job.resample = {strcat(suit_dir,'../wdzmap_',task, ...
-                    '_',condition,'.nii')};
-                job.ref = {strcat(suit_dir,'../zmap_',task, ...
-                    '_',condition,'.nii')};
-                %job.ref = {strcat(suit_dir,subj_t1_prefix,'_desc-preproc_T1w.nii')};
+            % Put data from SUIT space to native space
+            job.Affine = {strcat('Affine_', subj, ...
+                '_space-MNIPediatricAsym_cohort-5_res-2_label-GM_probseg.mat')};
+            job.flowfield = {strcat('u_a_', subj, ...
+                '_space-MNIPediatricAsym_cohort-5_res-2_label-GM_probseg.nii')};
+            job.resample = {strcat(suit_dir,fileList(i_cond).name)};
+            job.resample = {strcat(suit_dir,'../wd',fileList(i_cond).name)};
+            job.ref = {strcat(suit_dir,'../',fileList(i_cond).name)};
+            %job.ref = {strcat(suit_dir,subj_t1_prefix,'_desc-preproc_T1w.nii')};
 
-                suit_reslice_dartel_inv(job)
-            end
+            suit_reslice_dartel_inv(job)
         end
     end
     
@@ -133,19 +125,18 @@ for i = 1:length(subj_list)
     % Isolate cerebellum and brainstem
 
     % Set paths and file prefix
-    suit_dir = strcat(bids_dir, 'derivatives/SR_univariate/',subj,'/suit/');
+    suit_dir = strcat(data_dir,subj,'/suit/');
 
     cd(suit_dir);
 
     job.Affine = {strcat('Affine_', subj, ...
-                  '_run-1_space-MNI152NLin2009cAsym_label-GM_probseg.mat')};
+                  '_space-MNIPediatricAsym_cohort-5_res-2_label-GM_probseg.mat')};
     job.flowfield = {strcat('u_a_', subj, ...
-                    '_run-1_space-MNI152NLin2009cAsym_label-GM_probseg.nii')};
+                    '_space-MNIPediatricAsym_cohort-5_res-2_label-GM_probseg.nii')};
     job.resample = {strcat('c_', subj, ...
-                        '_run-1_space-MNI152NLin2009cAsym_desc-preproc_T1w_pcereb.nii')};
+                        '_space-MNIPediatricAsym_cohort-5_res-2_desc-preproc_T1w_pcereb.nii')};
 
-    job.ref = {strcat(suit_dir,'../zmap_','social', ...
-               '_','positive','.nii')};
+    job.ref = {strcat(suit_dir,'../',fileList(1).name)};
 
     suit_reslice_dartel_inv(job)
 end
@@ -159,9 +150,9 @@ suit_dir = strcat(bids_dir, 'derivatives/social_doors/',subj,'/suit/');
 cd(suit_dir);
 
 job.Affine = {strcat('Affine_', subj, ...
-              '_run-1_space-MNI152NLin2009cAsym_label-GM_probseg.mat')};
+              '_space-MNIPediatricAsym_cohort-5_res-2_label-GM_probseg.mat')};
 job.flowfield = {strcat('u_a_', subj, ...
-                '_run-1_space-MNI152NLin2009cAsym_label-GM_probseg.nii')};
+                '_space-MNIPediatricAsym_cohort-5_res-2_label-GM_probseg.nii')};
 job.resample = {'/usr/local/spm12/toolbox/suit/atlases/King_2019/atl-MDTB10_space-SUIT_dseg.nii '};
 
 job.ref = {strcat(suit_dir,'../tmap_',task, ...

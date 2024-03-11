@@ -11,7 +11,7 @@ body{
   
   h1.title {color: #ffffff;
     font-size: 24pt;
-    background-color: #720000;
+    background-color: #e31130;
     opacity: 1.0; /* completely opaque */
     padding-top: 1em;
     padding-bottom: .2em;
@@ -28,7 +28,7 @@ body{
   
   h1 {
     font-size: 18pt;
-    color: 	 white;
+    color: 	 #ffd300;
     background-color: #000000;
     padding-left: .5em;
     padding-top: .25em;
@@ -52,12 +52,12 @@ body{
   /* Code Chunks */
   pre {
     max-height: 350px;
-    background-color: #E4ECE7;
     overflow-y: auto;
+    background-color: #e6e6e6;
   }
   
   pre[class] {
-    max-height: 250px;
+    max-height: 700px;
   }
   
   .r code {

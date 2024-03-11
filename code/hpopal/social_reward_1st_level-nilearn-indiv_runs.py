@@ -34,7 +34,7 @@ bids_dir = '/data/neuron/SCN/SR/'
 os.chdir(bids_dir)
 
 # Set output directory
-outp_dir = bids_dir + 'derivatives/SR_univariate/'+subj+'/'
+outp_dir = bids_dir + 'derivatives/SR_first_level/'+subj+'/'
 
 
 ##########################################################################

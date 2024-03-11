@@ -1,5 +1,5 @@
 ---
-title: "Reaction Time Analyses - Jones"
+title: "Reaction Time Behavioral Analysis"
 author: "Author: Haroon Popal"
 date: "`r Sys.Date()`"
 output:   
@@ -10,7 +10,7 @@ output:
     df_print: paged
     css: !expr here::here("code/style.css")
 knit: (function(inputFile, encoding) { 
-      out_dir <- 'rt_behavioral/';
+      out_dir <- 'rt_behavioral';
       rmarkdown::render(inputFile,
                         encoding=encoding, 
                         output_file=file.path(dirname(inputFile), out_dir, 'index.html')) })
@@ -22,15 +22,26 @@ proj_dir <- '/Users/hpopal/Google Drive/My Drive/dscn_lab/projects/scon_social_r
 knitr::opts_knit$set(root.dir = proj_dir)
 ```
 
+# Background
+The objective of this study was to examine how non-autistic and autistic process social rewards, and whether participants would be able to learn whether two individuals were more similar or dissimilar to them. Prior to the fMRI scan, participants completed a survey of their interests (e.g. I am an animal lover). Using this survey, with over 200 responses, we matched other real participants to each other, such that every participant had a similar peer which shared 75% of the same interests, and a dissimilar peer which shared only 25% of the same interests. In the fMRI task, participants were shown an individuals name, either Shiloh or Charlie. These were the similar or dissimilar peers. For each trial, participants were first shown the peer's name, then their own response to a survey question (e.g. animal lover indicating that the participant had responded that they love animals). Next, participants had to press a button to learn about the shown peer. The feedback consisted of a thumbs up with a "Me too!" message or a thumbs down with a "Not me!" message, indicating whether the peer had shared that interest or not. There was also a computer peer condition in which the computer gave 50% positive feedback as a "match" or "no match". 
+
+## Task Design
+![Social Reward Task](../docs/task_figure.png)
+
+This was an event-related design with four runs of the task. 
+
+
+
 ## Setup Up
 
 ### Import Packages
-```{r, include=FALSE}
+```{r, message=FALSE}
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(emmeans)
 library(lmerTest)
+require(gridExtra)
 
 ```
 
@@ -53,19 +64,26 @@ print(paste('Found ', length(subj_df$participant_id), ' participants'))
 
 # Data Cleaning
 ```{r}
+# Create an empty dataframe to fill with all the participant data
 rt_data <- data.frame(matrix(ncol = 4, nrow = 0))
-  
+
+# Name columns for the empty dataframe  
 colnames(rt_data) <- c('ParticipantID', 'Run', 'ConditionName', 'Correct_RT')
 
+
 # Import Data
+
 for (subj in subj_df$participant_id) {
-  # Fine data for all runs
+  
+  # Find data for all runs
   run_files <- Sys.glob(paste(data_dir, subj, '/*-errors.csv', sep = ''))
   
   # Loop through runs and combine into one df
   for (run_file in run_files){
     temp_run_data <- read.csv(run_file)
+    
     if (sum(temp_run_data$redcap_v_task) == 0) {
+      
       # Filter for relevant columns
       temp_run_data_fltr <- temp_run_data[,colnames(rt_data)]
       
@@ -76,20 +94,21 @@ for (subj in subj_df$participant_id) {
 }
 ```
 
-Add group info to reaction time dataframe
+Add group (e.g. autistic, non-autistic) info to reaction time dataframe
 ```{r}
-rt_data <- merge(rt_data, subj_df, by.x = 'ParticipantID', by.y = 'participant_id')
+rt_data <- merge(rt_data, subj_df, 
+                 by.x = 'ParticipantID', by.y = 'participant_id')
 
 # Rename column
 rt_data <- rt_data %>% rename_at('ParticipantID', ~'participant_id')
 ```
 
-Create column for peer info
+Create column for the peer conditions info
 ```{r}
 rt_data <- rt_data %>% separate(ConditionName, c('Reward_Level', 'Condition'))
 ```
 
-Make group data nominal
+Make group data an nominal data type
 ```{r}
 rt_data$group<-gsub('1','non-autistic',as.character(rt_data$group))
 rt_data$group<-gsub('2','autistic',as.character(rt_data$group))
@@ -99,17 +118,22 @@ head(rt_data)
 
 ## Missed trials
 When a participant did not press the correct button, the feedback was "no data". This occurred in two instances:
+
 - When the participant made no button press
 - When the participant hit the incorrect button, and did not hit the correct button before the trial timed out
+
 In both these instances, the participant was not paying attention and so we should exclude these trials. If this was the case for more than 20% of the run, then we should exclude data from the entire run.
 
 ```{r}
 # Find participant runs with more than 20% missed trials
+
 exclude_subj_runs <- data.frame(participant_id = character(), Run = character(), stringsAsFactors = FALSE)
 
+# Create a list of all subject IDs
 subj_list <- unique(rt_data$participant_id)
 
 for (subj in subj_list) {
+  
   # Filter for subject specific data
   temp_subj_data <- rt_data[rt_data$participant_id == subj, ]
   
@@ -117,11 +141,14 @@ for (subj in subj_list) {
   temp_runs <- unique(temp_subj_data$Run)
   
   for (run in temp_runs) {
+    
+    # Filter for run specific data
     temp_run_rt <- temp_subj_data[temp_subj_data$Run == run, 'Correct_RT']
     
     # Calculate the percentage of missed trials
     temp_na_perc <- sum(is.na(temp_run_rt)) / length(temp_run_rt)
     
+    # If more than 20% missed trials, exlude the participant run
     if (temp_na_perc > 0.20) {
       exclude_subj_runs[nrow(exclude_subj_runs) + 1,] <- c(subj, run)
     }
@@ -129,7 +156,7 @@ for (subj in subj_list) {
 }
 ```
 
-Remove participant runs
+Use the list of bad participant runs to remove that data from the larger dataframe
 ```{r}
 for (i in 1:nrow(exclude_subj_runs)) {
   temp_drop_idx <- which(rt_data$participant_id == exclude_subj_runs[i, "participant_id"] & 
@@ -140,14 +167,13 @@ for (i in 1:nrow(exclude_subj_runs)) {
 
 ```
 
-Create column for missing trials
+With the remaining data, create column for missing trials. This might be interesting as it could be an indicator of learning. For example, if participants have learned who the dissimilar peer is, perhaps they would respond less for those trials than the similar peer trials. 
 ```{r}
 rt_data$accuracy <- 1
 rt_data[is.na(rt_data$Correct_RT),'accuracy'] <- 0
 ```
 
-
-Turn run into a categorical variable
+Add run as a categorical variable (don't end up using)
 ```{r}
 rt_data$Run.f <- factor(rt_data$Run)
 ```
@@ -181,8 +207,7 @@ for (subj in subj_df$participant_id) {
 
 ```
 
-```{r}
-require(gridExtra)
+```{r, warning=FALSE}
 plot1 <- ggplot(rt_data_mod, aes(x=Correct_RT)) + geom_histogram() + theme_classic()
 
 plot2 <- ggplot(rt_data_mod, aes(x=Correct_RT_logz)) + geom_histogram() + theme_classic()
@@ -190,38 +215,44 @@ plot2 <- ggplot(rt_data_mod, aes(x=Correct_RT_logz)) + geom_histogram() + theme_
 grid.arrange(plot1, plot2, ncol=2)
 
 ```
+The raw reaction times are not normally distributed and right-skewed. This may be a result of the task design where participants were given a window to view the interest and the peer condition, then a separate window to respond. So all participants were forced to view the condition for the same amount of time. After our log and z-transform, we have a normal distribution for the reaction times. 
 
 
 
 # Behavioral Analyses
 
 ## Run and Reaction Time
-Use a linear mixed-effects model to model both the fixed effects of our conditions of interest, and the random effects of the participants. An example would be that some participants are just faster to respond in all conditions. 
+Use a linear mixed-effects model to model both the fixed effects of our conditions of interest, and the random effects of the participants. An example of a random effect would be that some participants are just faster to respond in all conditions. 
 ```{r}
 model_run <- lmer(Correct_RT_logz ~ Run + (1 + Run | participant_id), 
                 data = rt_data_mod)
 summary(model_run)
 ```
 
+This analysis shows that participants are getting faster at responding throughout the task (B = -0.09, p = .0002). 
 ```{r}
 ggplot(data = rt_data_mod, aes(x=Run, y=Correct_RT_logz, group=Run)) + 
   geom_boxplot(outlier.shape = NA) + 
   geom_jitter(color='black', alpha=0.05) + 
   theme_classic()
 ```
+The box plots show this significant tread, and the individual response times for all participants. 
 
 
 ## Peer Category and Run Predicting Reaction Time
+Next, we will examine whether there are differences in reaction time to our peer conditions throughout the task. Again, the conditions were were getting feedback from a similar peer (75% positive feedback), dissimilar peer (25% positive feedback), or a random computer (50% positive feedback).
 ```{r}
 model_run_peer <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run | participant_id),
                        data = rt_data_mod)
 summary(model_run_peer)
 ```
+Accounting for the peer condition, task run had a significant impact on reaction times (B = -0.06, p = .0412), such that participants were getting faster as the task went on. There was no significant main effect of peer condition. The only interaction that was significant was participants had faster reaction times throughout the task for the similar peer condition, in comparison to the computer control condition (B = -0.05, p = 0.0449).
+
 
 ```{r}
-ggplot(data = rt_data_mod, aes(x=Condition, y=Correct_RT_logz, fill=factor(Run))) + 
+ggplot(data = rt_data_mod, aes(x=factor(Run), y=Correct_RT_logz, fill=Condition)) + 
   geom_boxplot(outlier.shape = NA) + 
-  geom_point(alpha=0.05, aes(fill=factor(Run)),
+  geom_point(alpha=0.05, aes(fill=Condition),
              position = position_jitterdodge(dodge.width = 0.8)) +
   theme_classic()
 ```
@@ -229,6 +260,7 @@ ggplot(data = rt_data_mod, aes(x=Condition, y=Correct_RT_logz, fill=factor(Run))
 
 
 # Group Analyses
+Next, we will analyze run by condition interactions for non-autistic adolescents and autistic adolescents, individually.
 
 ## Non-Autistic
 ```{r}
@@ -241,17 +273,21 @@ print(paste("There are ",length(unique(rt_data_mod_typ$participant_id)),
 model_run_peer_typ <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run | participant_id ), data = rt_data_mod_typ)
 summary(model_run_peer_typ)
 ```
+In non-autistic adolescents, there was not a significant main effect of run, indicating that participants did not get faster at responding as the task went on (b = -0.06, p = .0805). There were two significant interactions. Non-autistic adolescents had significantly faster reaction times as the task went on for the dissimilar peer (B = -0.08, p = .018) and the similar peer (B = -0.07, p = .0361) conditions  compared to the control condition. 
+
 
 ```{r}
 m.lst <- emtrends(model_run_peer_typ, "Condition", var="Run")
 pairs(m.lst)
 ```
+There was no significant difference between the similar peer and dissimilar peer condition by run interaction. Weird that the computer vs similar peer contrast is not significant here though...
 
 
 ```{r}
-ggplot(data = rt_data_mod_typ, aes(x=Condition, y=Correct_RT_logz, fill=factor(Run))) + 
+ggplot(data = rt_data_mod_typ, aes(x=factor(Run), y=Correct_RT_logz, 
+                                   fill=Condition)) + 
   geom_boxplot(outlier.shape = NA) + 
-  geom_point(alpha=0.05, aes(fill=factor(Run)),
+  geom_point(alpha=0.05, aes(fill=Condition),
              position = position_jitterdodge(dodge.width = 0.8)) +
   theme_classic()
 ```
@@ -269,6 +305,7 @@ print(paste("There are ",length(unique(rt_data_mod_asd$participant_id)),
 model_run_peer_asd <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run | participant_id), data = rt_data_mod_asd)
 summary(model_run_peer_asd)
 ```
+In autistic adolescents, there are no significant main effects or interactions.
 
 ```{r}
 m.lst <- emtrends(model_run_peer_asd, "Condition", var="Run")
@@ -277,33 +314,17 @@ pairs(m.lst)
 
 
 ```{r}
-ggplot(data = rt_data_mod_asd, aes(x=Condition, y=Correct_RT_logz, fill=factor(Run))) + 
+ggplot(data = rt_data_mod_asd, aes(x=factor(Run), y=Correct_RT_logz, 
+                                   fill=Condition)) + 
   geom_boxplot(outlier.shape = NA) + 
-  geom_point(alpha=0.05, aes(fill=factor(Run)),
+  geom_point(alpha=0.05, aes(fill=Condition),
              position = position_jitterdodge(dodge.width = 0.8)) +
   theme_classic()
 ```
 
 
 ## Autistic vs Non-Autistic
-```{r}
-model_run_peer_group <- lmer(Correct_RT_logz ~ Run*Condition*group + (1 + Run | participant_id),
-                       data = rt_data_mod)
-summary(model_run_peer_group)
-```
+
+In this analysis, we will examine specific contrasts between autistic and non-autistic adolescents. For example, we will test whether there are any group differences in reaction times for similar peers and the computer condition, throughout the task. 
 
 
-
-```{r}
-m.lst <- emtrends(model_run_peer_group, "Condition", var="Run")
-pairs(m.lst)
-```
-
-
-```{r}
-ggplot(data = rt_data_mod_asd, aes(x=Condition, y=Correct_RT_logz, fill=factor(Run))) + 
-  geom_boxplot(outlier.shape = NA) + 
-  geom_point(alpha=0.05, aes(fill=factor(Run)),
-             position = position_jitterdodge(dodge.width = 0.8)) +
-  theme_classic()
-```
