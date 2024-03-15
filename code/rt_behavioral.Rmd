@@ -257,15 +257,6 @@ summary(model_run_peer)
 ```
 
 
-```{r}
-group <- paste0(rt_data_mod$Run, rt_data_mod_typ$Condition)
-group <- aggregate(model.matrix(model_run_peer) ~ group, FUN=mean)
-# group
-rownames(group) <- group$group
-(group <- group[,-1])
-kable(head(group))
-```
-
 
 Accounting for the peer condition, task run had a significant impact on reaction times (B = -0.11, p < .001), such that participants were getting faster as the task went on. There was no significant main effect of peer condition. There is a trend for an interaction in which participants had faster reaction times throughout the task for the similar peer condition, in comparison to the computer control condition (B = .05, p = 0.05).
 
@@ -296,42 +287,17 @@ summary(model_run_peer_typ)
 In non-autistic adolescents, there a significant main effect of run, indicating that participants did get faster at responding as the task went on (b = -0.13, p < .001). There were two significant interactions. Non-autistic adolescents had significantly faster reaction times as the task went on for the dissimilar peer (B = -0.08, p = .018) and the similar peer (B = -0.07, p = .0361) conditions  compared to the control condition. 
 
 
-Building the contrast matrix
-```{r}
-group <- paste0(rt_data_mod_typ$Run, rt_data_mod_typ$Condition)
-group <- aggregate(model.matrix(model_run_peer_typ) ~ group, FUN=mean)
-# group
-rownames(group) <- group$group
-(group <- group[,-1])
-kable(head(group))
-```
-
-
-
-
-
-
-
-```{r}
-emm_mod <- emmeans(model_run_peer_typ, "Condition", var="Run")
-emm_mod
-```
-
-```{r}
-(contr_mat <- coef(pairs(emm_mod))[, c("c.2")])
-```
-
-```{r}
-emmeans(model_run_peer_typ, ~ Condition*Run, contr = contr_mat, adjust='none')
-```
-
-
-
 ```{r}
 m.lst <- emtrends(model_run_peer_typ, "Condition", var="Run")
+# Compute the specific contrasts amongst all the different slope differences
 pairs(m.lst)
 ```
 There was no significant difference between the similar peer and dissimilar peer condition by run interaction. Weird that the computer vs similar peer contrast is not significant here though...
+
+Maybe try doing contrasts with a [matrix](https://tdbianco.netlify.app/post/contrasts-in-multilevel-mixed-models-with-an-interaction/)
+
+
+
 
 
 ```{r}
