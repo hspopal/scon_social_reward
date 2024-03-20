@@ -61,10 +61,11 @@ print(paste('Found ', length(subj_df$participant_id), ' participants'))
 # Data Cleaning
 ```{r}
 # Create an empty dataframe to fill with all the participant data
-rt_data <- data.frame(matrix(ncol = 4, nrow = 0))
+rt_data <- data.frame(matrix(ncol = 6, nrow = 0))
 
 # Name columns for the empty dataframe  
-colnames(rt_data) <- c('ParticipantID', 'Run', 'ConditionName', 'Correct_RT')
+colnames(rt_data) <- c('ParticipantID', 'Run', 'X', 'rating', 'ConditionName', 
+                       'Correct_RT')
 
 
 # Import Data
@@ -88,6 +89,9 @@ for (subj in subj_df$participant_id) {
     } 
   }
 }
+
+# Rename trial number column 
+names(rt_data)[names(rt_data) == 'X'] <- 'trial_num'
 ```
 
 Add group (e.g. autistic, non-autistic) info to reaction time dataframe
@@ -99,15 +103,57 @@ rt_data <- merge(rt_data, subj_df,
 rt_data <- rt_data %>% rename_at('ParticipantID', ~'participant_id')
 ```
 
-Create column for the peer conditions info
+
+Create column for the peer conditions info and valence of feedback
 ```{r}
-rt_data <- rt_data %>% separate(ConditionName, c('Reward_Level', 'Condition'))
+rt_data <- rt_data %>% separate(ConditionName, c('Valence', 'Condition'))
+
+rt_data$Valence <- gsub('LowReward','negative',as.character(rt_data$Valence))
+rt_data$Valence <- gsub('HighReward','positive',as.character(rt_data$Valence))
 ```
+
+Calculate the valence of the previous trial within each condition
+```{r}
+# Create an empty column of NAs
+rt_data$Valence_prev <- NA
+
+for (subj in unique(rt_data$participant_id)) {
+  # Create a list of the runs for this participant
+  temp_run_list <- unique(rt_data[rt_data$participant_id == 'SCN_101', 'Run'])
+  
+  for (run in temp_run_list) {
+    
+    for (cond in c('SimPeer', 'DisPeer', 'Computer')) {
+      
+      # Calculate the number of trials for a given condition per run per subject
+      temp_len <- length(rt_data[rt_data$participant_id == subj & 
+                                 rt_data$Run == run & 
+                                 rt_data$Condition == cond, 'Valence'])
+      
+      # Create a list of the trial valences, excluding the first trial of that run
+      # since nothing was shown before that trial in the run
+      temp_val <- rt_data[rt_data$participant_id == subj & 
+                          rt_data$Run == run & 
+                          rt_data$Condition == cond, 'Valence'][1:temp_len-1]
+      
+      # Fill in the previous trial valence for that condition
+      rt_data[rt_data$participant_id == subj & 
+              rt_data$Run == run & 
+              rt_data$Condition == cond, 'Valence_prev'] <- c(NA, temp_val)
+    }
+  }
+
+}
+
+```
+
+
+
 
 Make group data an nominal data type
 ```{r}
-rt_data$group<-gsub('1','non-autistic',as.character(rt_data$group))
-rt_data$group<-gsub('2','autistic',as.character(rt_data$group))
+rt_data$group <- gsub('1','non-autistic',as.character(rt_data$group))
+rt_data$group <- gsub('2','autistic',as.character(rt_data$group))
 head(rt_data)
 ```
 
@@ -256,9 +302,20 @@ model_run_peer <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run | participant_
 summary(model_run_peer)
 ```
 
-
-
 Accounting for the peer condition, task run had a significant impact on reaction times (B = -0.11, p < .001), such that participants were getting faster as the task went on. There was no significant main effect of peer condition. There is a trend for an interaction in which participants had faster reaction times throughout the task for the similar peer condition, in comparison to the computer control condition (B = .05, p = 0.05).
+
+
+
+## Previous Peer Feedback and Run Predictin Reaction Time
+
+```{r}
+model_run_prev_val <- lmer(Correct_RT_logz ~ Run*Valence_prev + (1 + Run | participant_id) + (1 + Valence_prev | participant_id),
+                       data = rt_data_mod)
+summary(model_run_prev_val)
+```
+
+
+
 
 ```{r}
 ggplot(data = rt_data_mod, aes(x=factor(Run), y=Correct_RT_logz, fill=Condition)) + 
