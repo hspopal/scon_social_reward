@@ -39,6 +39,7 @@ library(emmeans)
 library(lmerTest)
 require(gridExtra)
 library(multcomp)
+library(plyr)
 ```
 
 ### Define directories
@@ -329,6 +330,60 @@ ggplot(data = subset(rt_data_mod, !is.na(Valence_prev)), aes(x=factor(Run), y=Co
              position = position_jitterdodge(dodge.width = 0.8)) +
   theme_classic()
 ```
+
+
+## Are participants learning?
+In the later runs, is there a difference in reaction time between the similar and dissimilar peer conditions? How many participants show this learning effect?
+
+```{r}
+rt_data_mod %>%
+  group_by(participant_id) %>%
+  summarise_at(vars(Correct_RT_logz), list(name = mean))
+```
+
+```{r}
+rt_means_subj_cond_run <- ddply(rt_data_mod,c('participant_id','Condition','Run'), 
+                                summarise, 
+                                mean=mean(Correct_RT, na.rm=TRUE))
+```
+
+Calculate the difference in RT for similar and dissimilar peer conditions at run 4
+```{r}
+r4_peer_diff <- rt_data <- data.frame(matrix(ncol = 2, nrow = 0))
+
+# Name columns for the empty dataframe  
+colnames(r4_peer_diff) <- c('ParticipantID', 'sim_dis_RT')
+
+for (subj in unique(rt_means_subj_cond_run$participant_id)) {
+  temp_subj_data <- rt_means_subj_cond_run[rt_means_subj_cond_run$participant_id == subj, ]
+  
+  temp_last_run <- temp_subj_data$Run[length(unique(temp_subj_data$Run))]
+  
+  temp_run_data <- temp_subj_data[temp_subj_data$Run == temp_last_run, ]
+  temp_diff <- temp_run_data[temp_run_data$Condition == 'SimPeer', 'mean'] - temp_run_data[temp_run_data$Condition == 'DisPeer', 'mean']
+  
+  r4_peer_diff[nrow(r4_peer_diff) + 1,] = c(subj,temp_diff)
+}
+
+r4_peer_diff$sim_dis_RT <- as.numeric(r4_peer_diff$sim_dis_RT) 
+
+ggplot(r4_peer_diff, aes(x=sim_dis_RT)) + geom_histogram() + theme_classic()
+
+```
+
+```{r}
+prop_learn <- nrow(r4_peer_diff[r4_peer_diff$sim_dis_RT < 0, ]) / nrow(r4_peer_diff)
+
+print(paste(prop_learn, '% of participants had faster RTs for similar peers than dissimilar peers for their last run.'))
+```
+
+
+```{r}
+t.test(r4_peer_diff$sim_dis_RT, alternative = "two.sided", var.equal = FALSE)
+```
+
+### Do participants show a decrease in RT after receiving negative feedback?
+
 
 
 
