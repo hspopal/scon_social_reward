@@ -304,6 +304,13 @@ summary(model_run_peer)
 
 Accounting for the peer condition, task run had a significant impact on reaction times (B = -0.11, p < .001), such that participants were getting faster as the task went on. There was no significant main effect of peer condition. There is a trend for an interaction in which participants had faster reaction times throughout the task for the similar peer condition, in comparison to the computer control condition (B = .05, p = 0.05).
 
+```{r}
+ggplot(data = rt_data_mod, aes(x=factor(Run), y=Correct_RT_logz, fill=Condition)) + 
+  geom_boxplot(outlier.shape = NA) + 
+  geom_point(alpha=0.05, aes(fill=Condition),
+             position = position_jitterdodge(dodge.width = 0.8)) +
+  theme_classic()
+```
 
 
 ## Previous Peer Feedback and Run Predictin Reaction Time
@@ -315,15 +322,15 @@ summary(model_run_prev_val)
 ```
 
 
-
-
 ```{r}
-ggplot(data = rt_data_mod, aes(x=factor(Run), y=Correct_RT_logz, fill=Condition)) + 
+ggplot(data = subset(rt_data_mod, !is.na(Valence_prev)), aes(x=factor(Run), y=Correct_RT_logz, fill=Valence_prev)) + 
   geom_boxplot(outlier.shape = NA) + 
-  geom_point(alpha=0.05, aes(fill=Condition),
+  geom_point(alpha=0.05, aes(fill=Valence_prev),
              position = position_jitterdodge(dodge.width = 0.8)) +
   theme_classic()
 ```
+
+
 
 
 
