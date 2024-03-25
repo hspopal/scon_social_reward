@@ -7,6 +7,7 @@ output:
     toc: true
     toc_float: true
     toc_depth: 2
+    number_sections: true
     df_print: paged
     css: !expr here::here("code/style.css")
 
@@ -21,11 +22,11 @@ knitr::opts_knit$set(root.dir = proj_dir)
 # Background
 The objective of this study was to examine how non-autistic and autistic process social rewards, and whether participants would be able to learn whether two individuals were more similar or dissimilar to them. Prior to the fMRI scan, participants completed a survey of their interests (e.g. I am an animal lover). Using this survey, with over 200 responses, we matched other real participants to each other, such that every participant had a similar peer which shared 75% of the same interests, and a dissimilar peer which shared only 25% of the same interests. In the fMRI task, participants were shown an individuals name, either Shiloh or Charlie. These were the similar or dissimilar peers. For each trial, participants were first shown the peer's name, then their own response to a survey question (e.g. animal lover indicating that the participant had responded that they love animals). Next, participants had to press a button to learn about the shown peer. The feedback consisted of a thumbs up with a "Me too!" message or a thumbs down with a "Not me!" message, indicating whether the peer had shared that interest or not. There was also a computer peer condition in which the computer gave 50% positive feedback as a "match" or "no match". 
 
+
 ## Task Design
 ![Social Reward Task](../docs/task_figure.png)
 
 This was an event-related design with four runs of the task. 
-
 
 
 ## Setup Up
@@ -104,7 +105,6 @@ rt_data <- merge(rt_data, subj_df,
 rt_data <- rt_data %>% rename_at('ParticipantID', ~'participant_id')
 ```
 
-
 Create column for the peer conditions info and valence of feedback
 ```{r}
 rt_data <- rt_data %>% separate(ConditionName, c('Valence', 'Condition'))
@@ -147,9 +147,6 @@ for (subj in unique(rt_data$participant_id)) {
 }
 
 ```
-
-
-
 
 Make group data an nominal data type
 ```{r}
@@ -265,6 +262,7 @@ plot2 <- ggplot(rt_data_mod, aes(x=Correct_RT_logz)) + geom_histogram() + theme_
 grid.arrange(plot1, plot2, ncol=2)
 
 ```
+
 The raw reaction times are not normally distributed and right-skewed. This may be a result of the task design where participants were given a window to view the interest and the peer condition, then a separate window to respond. So all participants were forced to view the condition for the same amount of time. After our log and z-transform, we have a normal distribution for the reaction times. 
 
 Lastly, we will set the similar peer condition as the reference group for the regression analyses
@@ -273,9 +271,9 @@ rt_data_mod$Condition <- relevel(factor(rt_data_mod$Condition), ref = "SimPeer")
 ```
 
 
-
-
+***
 # Behavioral Analyses
+
 
 ## Run and Reaction Time
 Use a linear mixed-effects model to model both the fixed effects of our conditions of interest, and the random effects of the participants. An example of a random effect would be that some participants are just faster to respond in all conditions. 
@@ -292,6 +290,7 @@ ggplot(data = rt_data_mod, aes(x=Run, y=Correct_RT_logz, group=Run)) +
   geom_jitter(color='black', alpha=0.05) + 
   theme_classic()
 ```
+
 The box plots show this significant tread, and the individual response times for all participants. 
 
 
@@ -314,14 +313,13 @@ ggplot(data = rt_data_mod, aes(x=factor(Run), y=Correct_RT_logz, fill=Condition)
 ```
 
 
-## Previous Peer Feedback and Run Predictin Reaction Time
-
+## Previous Feedback and Run Predicting Reaction Time
+Another way we can look at reaction time is to examine if reaction times would be effected by the valence of the previous trial from the same condition. For example, when considering to learn about "Shiloh" in the current trial, if Shiloh had given negative feedback in their last trial, perhaps the participants would be less motivated to learn about Shiloh in the current trial. 
 ```{r}
 model_run_prev_val <- lmer(Correct_RT_logz ~ Run*Valence_prev + (1 + Run | participant_id) + (1 + Valence_prev | participant_id),
                        data = rt_data_mod)
 summary(model_run_prev_val)
 ```
-
 
 ```{r}
 ggplot(data = subset(rt_data_mod, !is.na(Valence_prev)), aes(x=factor(Run), y=Correct_RT_logz, fill=Valence_prev)) + 
@@ -331,15 +329,31 @@ ggplot(data = subset(rt_data_mod, !is.na(Valence_prev)), aes(x=factor(Run), y=Co
   theme_classic()
 ```
 
+The valence of the previous within condition trial did not have an impact on reaction times. 
 
-## Are participants learning?
-In the later runs, is there a difference in reaction time between the similar and dissimilar peer conditions? How many participants show this learning effect?
+
+## Previous Feedback, Peer Condition, and Run Predicting Reaction Time
+Since the previous analysis failed, maybe explicitly adding an interaction for the peer condition will have an impact on reaction times. For example, the valence of the trial might be more salient when it is a similar peer who previously gave you positive feedback or a dissimilar peer who previously gave you negative feedback. 
 
 ```{r}
-rt_data_mod %>%
-  group_by(participant_id) %>%
-  summarise_at(vars(Correct_RT_logz), list(name = mean))
+model_run_prev_val_cond <- lmer(Correct_RT_logz ~ Run*Condition*Valence_prev + (1 + Run | participant_id) + (1 + Valence_prev | participant_id) + (1 + Condition | participant_id),
+                       data = rt_data_mod)
+summary(model_run_prev_val_cond)
 ```
+
+```{r}
+ggplot(data = subset(rt_data_mod, !is.na(Valence_prev)), aes(x=factor(Run), y=Correct_RT_logz, fill=Condition, alpha=Valence_prev)) + 
+  geom_boxplot(outlier.shape = NA) + 
+  theme_classic()
+```
+
+Makes no difference.
+
+
+## Are participants learning?
+
+### Reaction time difference between similar and dissimilar peers
+In the later runs, is there a difference in reaction time between the similar and dissimilar peer conditions? How many participants show this learning effect?
 
 ```{r}
 rt_means_subj_cond_run <- ddply(rt_data_mod,c('participant_id','Condition','Run'), 
@@ -374,7 +388,51 @@ ggplot(r4_peer_diff, aes(x=sim_dis_RT)) + geom_histogram() + theme_classic()
 ```{r}
 prop_learn <- nrow(r4_peer_diff[r4_peer_diff$sim_dis_RT < 0, ]) / nrow(r4_peer_diff)
 
-print(paste(prop_learn, '% of participants had faster RTs for similar peers than dissimilar peers for their last run.'))
+print(paste(round(prop_learn, 4)*100, '% of participants had faster RTs for similar peers than dissimilar peers for their last run.'))
+```
+
+```{r}
+t.test(r4_peer_diff$sim_dis_RT, alternative = "two.sided", var.equal = FALSE)
+```
+
+
+### Do participants show a decrease in RT after receiving positive feedback compared to negative feedback?
+Note that previous valence here is the previous valence of the trial within the same condition. 
+```{r}
+rt_means_subj_pval_run <- ddply(rt_data_mod,c('participant_id','Valence_prev','Run'), 
+                                summarise, 
+                                mean=mean(Correct_RT, na.rm=TRUE))
+
+# Remove rows with NA
+rt_means_subj_pval_run <- rt_means_subj_pval_run[complete.cases(rt_means_subj_pval_run), ]
+```
+
+Calculate the difference in RT for similar and dissimilar peer conditions at run 4
+```{r}
+# Create a new column for for previous valence
+r4_peer_diff$pos_neg_RT <- NA
+
+for (subj in unique(rt_means_subj_pval_run$participant_id)) {
+  temp_subj_data <- rt_means_subj_pval_run[rt_means_subj_pval_run$participant_id == subj, ]
+  
+  temp_last_run <- temp_subj_data$Run[length(unique(temp_subj_data$Run))]
+  
+  temp_run_data <- temp_subj_data[temp_subj_data$Run == temp_last_run, ]
+  temp_diff <- temp_run_data[temp_run_data$Valence_prev == 'positive', 'mean'] - temp_run_data[temp_run_data$Valence_prev == 'negative', 'mean']
+  
+  r4_peer_diff[r4_peer_diff$ParticipantID == subj, 'pos_neg_RT'] = temp_diff
+}
+
+r4_peer_diff$pos_neg_RT <- as.numeric(r4_peer_diff$pos_neg_RT) 
+
+ggplot(r4_peer_diff, aes(x=pos_neg_RT)) + geom_histogram() + theme_classic()
+
+```
+
+```{r}
+prop_learn <- nrow(r4_peer_diff[r4_peer_diff$pos_neg_RT < 0, ]) / nrow(r4_peer_diff)
+
+print(paste(round(prop_learn, 4)*100, '% of participants had faster RTs for trials that were precided by a positive outcome than negative outcomes, for their last run.'))
 ```
 
 
@@ -382,13 +440,9 @@ print(paste(prop_learn, '% of participants had faster RTs for similar peers than
 t.test(r4_peer_diff$sim_dis_RT, alternative = "two.sided", var.equal = FALSE)
 ```
 
-### Do participants show a decrease in RT after receiving negative feedback?
 
 
-
-
-
-
+***
 # Group Analyses
 Next, we will analyze run by condition interactions for non-autistic adolescents and autistic adolescents, individually.
 
