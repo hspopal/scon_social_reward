@@ -271,9 +271,205 @@ rt_data_mod$Condition <- relevel(factor(rt_data_mod$Condition), ref = "SimPeer")
 ```
 
 
-***
-# Behavioral Analyses
 
+
+
+
+
+
+
+
+***
+# Non-Autistic Adolescents
+
+```{r}
+rt_data_mod_typ <- filter(rt_data_mod, group == 'non-autistic')
+print(paste("There are ",length(unique(rt_data_mod_typ$participant_id)), 
+            " autistic participants"))
+```
+
+## Run and Reaction Time
+Use a linear mixed-effects model to model both the fixed effects of our conditions of interest, and the random effects of the participants. An example of a random effect would be that some participants are just faster to respond in all conditions. 
+```{r}
+model_run_typ <- lmer(Correct_RT_logz ~ Run + (1 + Run | participant_id), 
+                data = rt_data_mod_typ)
+summary(model_run_typ)
+```
+
+This analysis shows that participants are getting faster at responding throughout the task (B = -0.09, p = .0002). 
+```{r}
+ggplot(data = rt_data_mod_typ, aes(x=Run, y=Correct_RT_logz, group=Run)) + 
+  geom_boxplot(outlier.shape = NA) + 
+  geom_jitter(color='black', alpha=0.05) + 
+  theme_classic()
+```
+
+The box plots show this significant tread, and the individual response times for all participants. 
+
+
+## Peer Category and Run Predicting Reaction Time
+Next, we will examine whether there are differences in reaction time to our peer conditions throughout the task. Again, the conditions were were getting feedback from a similar peer (75% positive feedback), dissimilar peer (25% positive feedback), or a random computer (50% positive feedback).
+
+```{r}
+model_run_peer_typ <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run*Condition | participant_id),
+                       data = rt_data_mod_typ)
+summary(model_run_peer_typ)
+```
+
+
+Accounting for the peer condition, task run had a significant impact on reaction times (B = -0.11, p < .001), such that participants were getting faster as the task went on. There was no significant main effect of peer condition. There is a trend for an interaction in which participants had faster reaction times throughout the task for the similar peer condition, in comparison to the computer control condition (B = .05, p = 0.05).
+
+```{r}
+ggplot(data = rt_data_mod_typ, aes(x=factor(Run), y=Correct_RT_logz, fill=Condition)) + 
+  geom_boxplot(outlier.shape = NA) + 
+  geom_point(alpha=0.05, aes(fill=Condition),
+             position = position_jitterdodge(dodge.width = 0.8)) +
+  theme_classic()
+```
+
+
+## Previous Feedback and Run Predicting Reaction Time
+Another way we can look at reaction time is to examine if reaction times would be effected by the valence of the previous trial from the same condition. For example, when considering to learn about "Shiloh" in the current trial, if Shiloh had given negative feedback in their last trial, perhaps the participants would be less motivated to learn about Shiloh in the current trial. 
+```{r}
+model_run_prev_val_typ <- lmer(Correct_RT_logz ~ Run*Valence_prev + (1 + Run*Valence_prev | participant_id),
+                       data = rt_data_mod_typ)
+summary(model_run_prev_val_typ)
+```
+
+```{r}
+ggplot(data = subset(rt_data_mod_typ, !is.na(Valence_prev)), aes(x=factor(Run), y=Correct_RT_logz, fill=Valence_prev)) + 
+  geom_boxplot(outlier.shape = NA) + 
+  geom_point(alpha=0.05, aes(fill=Valence_prev),
+             position = position_jitterdodge(dodge.width = 0.8)) +
+  theme_classic()
+```
+
+The valence of the previous within condition trial did not have an impact on reaction times. 
+
+
+## Previous Feedback, Peer Condition, and Run Predicting Reaction Time
+Since the previous analysis failed, maybe explicitly adding an interaction for the peer condition will have an impact on reaction times. For example, the valence of the trial might be more salient when it is a similar peer who previously gave you positive feedback or a dissimilar peer who previously gave you negative feedback. 
+
+```{r}
+model_run_prev_val_cond_typ <- lmer(Correct_RT_logz ~ Run*Condition*Valence_prev + (1 + Run*Condition*Valence_prev | participant_id),
+                       data = rt_data_mod_typ)
+summary(model_run_prev_val_cond_typ)
+```
+
+```{r}
+ggplot(data = subset(rt_data_mod_typ, !is.na(Valence_prev)), aes(x=factor(Run), y=Correct_RT_logz, fill=Condition, alpha=Valence_prev)) + 
+  geom_boxplot(outlier.shape = NA) + 
+  theme_classic()
+```
+
+Makes no difference.
+
+
+## Are participants learning?
+
+### Reaction time difference between similar and dissimilar peers
+In the later runs, is there a difference in reaction time between the similar and dissimilar peer conditions? How many participants show this learning effect?
+
+```{r}
+rt_means_subj_cond_run_typ <- ddply(rt_data_mod_typ, c('participant_id','Condition','Run'), 
+                                summarise, 
+                                mean=mean(Correct_RT, na.rm=TRUE))
+```
+
+Calculate the difference in RT for similar and dissimilar peer conditions at run 4
+```{r}
+r4_peer_diff_typ <- data.frame(matrix(ncol = 2, nrow = 0))
+
+# Name columns for the empty dataframe  
+colnames(r4_peer_diff_typ) <- c('ParticipantID', 'sim_dis_RT')
+
+for (subj in unique(rt_means_subj_cond_run_typ$participant_id)) {
+  temp_subj_data <- rt_means_subj_cond_run_typ[rt_means_subj_cond_run_typ$participant_id == subj, ]
+  
+  temp_last_run <- temp_subj_data$Run[length(unique(temp_subj_data$Run))]
+  
+  temp_run_data <- temp_subj_data[temp_subj_data$Run == temp_last_run, ]
+  temp_diff <- temp_run_data[temp_run_data$Condition == 'SimPeer', 'mean'] - temp_run_data[temp_run_data$Condition == 'DisPeer', 'mean']
+  
+  r4_peer_diff_typ[nrow(r4_peer_diff_typ) + 1,] = c(subj,temp_diff)
+}
+
+r4_peer_diff_typ$sim_dis_RT <- as.numeric(r4_peer_diff_typ$sim_dis_RT) 
+
+ggplot(r4_peer_diff_typ, aes(x=sim_dis_RT)) + geom_histogram() + theme_classic()
+
+```
+
+```{r}
+prop_learn <- nrow(r4_peer_diff_typ[r4_peer_diff_typ$sim_dis_RT < 0, ]) / nrow(r4_peer_diff_typ)
+
+print(paste(round(prop_learn, 4)*100, '% of participants had faster RTs for similar peers than dissimilar peers for their last run.'))
+```
+
+```{r}
+t.test(r4_peer_diff_typ$sim_dis_RT, alternative = "two.sided", var.equal = FALSE)
+```
+
+
+### Do participants show a decrease in RT after receiving positive feedback compared to negative feedback?
+Note that previous valence here is the previous valence of the trial within the same condition. 
+```{r}
+rt_means_subj_pval_run_typ <- ddply(rt_data_mod_typ, c('participant_id','Valence_prev','Run'), 
+                                summarise, 
+                                mean=mean(Correct_RT, na.rm=TRUE))
+
+# Remove rows with NA
+rt_means_subj_pval_run_typ <- rt_means_subj_pval_run_typ[complete.cases(rt_means_subj_pval_run_typ), ]
+```
+
+Calculate the difference in RT for similar and dissimilar peer conditions at run 4
+```{r}
+# Create a new column for for previous valence
+r4_peer_diff_typ$pos_neg_RT <- NA
+
+for (subj in unique(rt_means_subj_pval_run_typ$participant_id)) {
+  temp_subj_data <- rt_means_subj_pval_run_typ[rt_means_subj_pval_run_typ$participant_id == subj, ]
+  
+  temp_last_run <- temp_subj_data$Run[length(unique(temp_subj_data$Run))]
+  
+  temp_run_data <- temp_subj_data[temp_subj_data$Run == temp_last_run, ]
+  temp_diff <- temp_run_data[temp_run_data$Valence_prev == 'positive', 'mean'] - temp_run_data[temp_run_data$Valence_prev == 'negative', 'mean']
+  
+  r4_peer_diff_typ[r4_peer_diff_typ$ParticipantID == subj, 'pos_neg_RT'] = temp_diff
+}
+
+r4_peer_diff_typ$pos_neg_RT <- as.numeric(r4_peer_diff_typ$pos_neg_RT) 
+
+ggplot(r4_peer_diff_typ, aes(x=pos_neg_RT)) + geom_histogram() + theme_classic()
+
+```
+
+```{r}
+prop_learn <- nrow(r4_peer_diff_typ[r4_peer_diff_typ$pos_neg_RT < 0, ]) / nrow(r4_peer_diff_typ)
+
+print(paste(round(prop_learn, 4)*100, '% of participants had faster RTs for trials that were precided by a positive outcome than negative outcomes, for their last run.'))
+```
+
+
+```{r}
+t.test(r4_peer_diff_typ$pos_neg_RT, alternative = "two.sided", var.equal = FALSE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+***
+# All Participants
 
 ## Run and Reaction Time
 Use a linear mixed-effects model to model both the fixed effects of our conditions of interest, and the random effects of the participants. An example of a random effect would be that some participants are just faster to respond in all conditions. 
@@ -296,11 +492,13 @@ The box plots show this significant tread, and the individual response times for
 
 ## Peer Category and Run Predicting Reaction Time
 Next, we will examine whether there are differences in reaction time to our peer conditions throughout the task. Again, the conditions were were getting feedback from a similar peer (75% positive feedback), dissimilar peer (25% positive feedback), or a random computer (50% positive feedback).
+
 ```{r}
-model_run_peer <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run | participant_id) + (1 + Condition | participant_id),
+model_run_peer <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run*Condition | participant_id),
                        data = rt_data_mod)
 summary(model_run_peer)
 ```
+
 
 Accounting for the peer condition, task run had a significant impact on reaction times (B = -0.11, p < .001), such that participants were getting faster as the task went on. There was no significant main effect of peer condition. There is a trend for an interaction in which participants had faster reaction times throughout the task for the similar peer condition, in comparison to the computer control condition (B = .05, p = 0.05).
 
@@ -316,7 +514,7 @@ ggplot(data = rt_data_mod, aes(x=factor(Run), y=Correct_RT_logz, fill=Condition)
 ## Previous Feedback and Run Predicting Reaction Time
 Another way we can look at reaction time is to examine if reaction times would be effected by the valence of the previous trial from the same condition. For example, when considering to learn about "Shiloh" in the current trial, if Shiloh had given negative feedback in their last trial, perhaps the participants would be less motivated to learn about Shiloh in the current trial. 
 ```{r}
-model_run_prev_val <- lmer(Correct_RT_logz ~ Run*Valence_prev + (1 + Run | participant_id) + (1 + Valence_prev | participant_id),
+model_run_prev_val <- lmer(Correct_RT_logz ~ Run*Valence_prev + (1 + Run*Valence_prev | participant_id),
                        data = rt_data_mod)
 summary(model_run_prev_val)
 ```
@@ -336,7 +534,7 @@ The valence of the previous within condition trial did not have an impact on rea
 Since the previous analysis failed, maybe explicitly adding an interaction for the peer condition will have an impact on reaction times. For example, the valence of the trial might be more salient when it is a similar peer who previously gave you positive feedback or a dissimilar peer who previously gave you negative feedback. 
 
 ```{r}
-model_run_prev_val_cond <- lmer(Correct_RT_logz ~ Run*Condition*Valence_prev + (1 + Run | participant_id) + (1 + Valence_prev | participant_id) + (1 + Condition | participant_id),
+model_run_prev_val_cond <- lmer(Correct_RT_logz ~ Run*Condition*Valence_prev + (1 + Run*Condition*Valence_prev | participant_id),
                        data = rt_data_mod)
 summary(model_run_prev_val_cond)
 ```
@@ -363,7 +561,7 @@ rt_means_subj_cond_run <- ddply(rt_data_mod,c('participant_id','Condition','Run'
 
 Calculate the difference in RT for similar and dissimilar peer conditions at run 4
 ```{r}
-r4_peer_diff <- rt_data <- data.frame(matrix(ncol = 2, nrow = 0))
+r4_peer_diff <- data.frame(matrix(ncol = 2, nrow = 0))
 
 # Name columns for the empty dataframe  
 colnames(r4_peer_diff) <- c('ParticipantID', 'sim_dis_RT')
@@ -446,44 +644,20 @@ t.test(r4_peer_diff$sim_dis_RT, alternative = "two.sided", var.equal = FALSE)
 # Group Analyses
 Next, we will analyze run by condition interactions for non-autistic adolescents and autistic adolescents, individually.
 
-## Non-Autistic
-```{r}
-rt_data_mod_typ <- filter(rt_data_mod, group == 'non-autistic')
-print(paste("There are ",length(unique(rt_data_mod_typ$participant_id)), 
-            " non-autistic participants"))
-```
-
-```{r}
-model_run_peer_typ <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run | participant_id ) + (1 + Condition | participant_id ), data = rt_data_mod_typ)
-summary(model_run_peer_typ)
-```
-In non-autistic adolescents, there a significant main effect of run, indicating that participants did get faster at responding as the task went on (b = -0.13, p < .001). There were two significant interactions. Non-autistic adolescents had significantly faster reaction times as the task went on for the dissimilar peer (B = -0.08, p = .018) and the similar peer (B = -0.07, p = .0361) conditions  compared to the control condition. 
-
-
-```{r}
-m.lst <- emtrends(model_run_peer_typ, "Condition", var="Run")
-# Compute the specific contrasts amongst all the different slope differences
-pairs(m.lst)
-```
-There was no significant difference between the similar peer and dissimilar peer condition by run interaction. Weird that the computer vs similar peer contrast is not significant here though...
-
-Maybe try doing contrasts with a [matrix](https://tdbianco.netlify.app/post/contrasts-in-multilevel-mixed-models-with-an-interaction/)
 
 
 
 
 
-```{r}
-ggplot(data = rt_data_mod_typ, aes(x=factor(Run), y=Correct_RT_logz, 
-                                   fill=Condition)) + 
-  geom_boxplot(outlier.shape = NA) + 
-  geom_point(alpha=0.05, aes(fill=Condition),
-             position = position_jitterdodge(dodge.width = 0.8)) +
-  theme_classic()
-```
 
 
 
+
+
+
+
+
+***
 ## Autistic
 ```{r}
 rt_data_mod_asd <- filter(rt_data_mod, group == 'autistic')

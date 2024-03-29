@@ -1,0 +1,94 @@
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-SR_run-01_bolda (96x96x66x241)
+Conversion required 8.293007 seconds (8.290000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-SR_run-02_bolda (96x96x66x241)
+Conversion required 8.331689 seconds (8.310000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-SR_run-03_bolda (96x96x66x241)
+Conversion required 8.252773 seconds (8.240000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-SR_run-04_bolda (96x96x66x241)
+Conversion required 8.170796 seconds (8.160000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 418 DICOM file(s)
+Convert 418 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-NS_run-01_bolda (96x96x66x418)
+Conversion required 14.491509 seconds (14.480000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 458 DICOM file(s)
+Convert 458 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-NS_run-02_bolda (96x96x66x458)
+Conversion required 15.756405 seconds (15.740000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 399 DICOM file(s)
+Convert 399 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-NS_run-03_bolda (96x96x66x399)
+Conversion required 14.536734 seconds (14.520000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 170 DICOM file(s)
+Convert 170 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-HBN_run-01_bolda (96x96x66x170)
+Conversion required 6.286430 seconds (6.270000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Example output filename: 'sub-SCN118_task-HBN_run-02_bold.nii.gz'
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 192 DICOM file(s)
+Warning: interpolated protocol 't1_mpr_sag_p2_iso_0.9' may be unsuitable for dwidenoise/mrdegibbs. /data/neuron/SCN/dicom/SCN_118/20220815-141458.583000/13-t1_mpr_sag_p2_iso_0.9/image000001.dcm
+Convert 192 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/anat/sub-SCN118_T1wa (512x512x192x1)
+Conversion required 4.357299 seconds (4.350000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 2 DICOM file(s)
+Convert 2 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/fmap/sub-SCN118_dir-ap_epia (96x96x66x2)
+Conversion required 0.082962 seconds (0.080000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 2 DICOM file(s)
+Convert 2 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/fmap/sub-SCN118_dir-pa_epia (96x96x66x2)
+Conversion required 0.079656 seconds (0.080000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-SR_run-01_boldb (96x96x66x241)
+Conversion required 8.061730 seconds (8.050000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-SR_run-02_boldb (96x96x66x241)
+Conversion required 8.237300 seconds (8.220000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-SR_run-03_boldb (96x96x66x241)
+Conversion required 8.611866 seconds (8.610000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 241 DICOM file(s)
+Convert 241 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-SR_run-04_boldb (96x96x66x241)
+Conversion required 8.223738 seconds (8.210000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 418 DICOM file(s)
+Convert 418 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-NS_run-01_boldb (96x96x66x418)
+Conversion required 14.306787 seconds (14.300000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 458 DICOM file(s)
+Convert 458 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-NS_run-02_boldb (96x96x66x458)
+Conversion required 15.390742 seconds (15.370000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 399 DICOM file(s)
+Convert 399 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-NS_run-03_boldb (96x96x66x399)
+Conversion required 13.678682 seconds (13.670000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 170 DICOM file(s)
+Convert 170 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/func/sub-SCN118_task-HBN_run-01_boldb (96x96x66x170)
+Conversion required 5.769424 seconds (5.760000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Example output filename: 'sub-SCN118_task-HBN_run-02_bold.nii.gz'
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 192 DICOM file(s)
+Warning: interpolated protocol 't1_mpr_sag_p2_iso_0.9' may be unsuitable for dwidenoise/mrdegibbs. /data/neuron/SCN/dicom/SCN_118/20220815-141458.583000/13-t1_mpr_sag_p2_iso_0.9/image000001.dcm
+Convert 192 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/anat/sub-SCN118_T1wb (512x512x192x1)
+Conversion required 4.488745 seconds (4.480000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 2 DICOM file(s)
+Convert 2 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/fmap/sub-SCN118_dir-ap_epib (96x96x66x2)
+Conversion required 0.083026 seconds (0.070000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 2 DICOM file(s)
+Convert 2 DICOM as /data/neuron/SCN/BIDS/sub-SCN118/fmap/sub-SCN118_dir-pa_epib (96x96x66x2)
+Conversion required 0.081044 seconds (0.070000 for core code).
