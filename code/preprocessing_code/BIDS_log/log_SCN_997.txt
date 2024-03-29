@@ -1,0 +1,38 @@
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 53 DICOM file(s)
+Convert 53 DICOM as /data/neuron/SCN/BIDS/sub-SCN997/func/sub-SCN997_task-SR_run-01_bold (96x96x66x53)
+Conversion required 1.730224 seconds (1.730000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 17 DICOM file(s)
+Convert 17 DICOM as /data/neuron/SCN/BIDS/sub-SCN997/func/sub-SCN997_task-SR_run-02_bold (96x96x66x17)
+Conversion required 0.678836 seconds (0.670000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 38 DICOM file(s)
+Convert 38 DICOM as /data/neuron/SCN/BIDS/sub-SCN997/func/sub-SCN997_task-SR_run-03_bold (96x96x66x38)
+Conversion required 1.386482 seconds (1.380000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 14 DICOM file(s)
+Convert 14 DICOM as /data/neuron/SCN/BIDS/sub-SCN997/func/sub-SCN997_task-SR_run-04_bold (96x96x66x14)
+Conversion required 0.508384 seconds (0.500000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 4 DICOM file(s)
+Convert 4 DICOM as /data/neuron/SCN/BIDS/sub-SCN997/func/sub-SCN997_task-NS_run-01_bold (96x96x66x4)
+Conversion required 0.163641 seconds (0.160000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 31 DICOM file(s)
+Convert 31 DICOM as /data/neuron/SCN/BIDS/sub-SCN997/func/sub-SCN997_task-NS_run-02_bold (96x96x66x31)
+Conversion required 1.070705 seconds (1.060000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Example output filename: 'sub-SCN997_task-NS_run-03_bold.nii.gz'
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Example output filename: 'sub-SCN997_task-HBN_run-01_bold.nii.gz'
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Example output filename: 'sub-SCN997_task-HBN_run-02_bold.nii.gz'
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Example output filename: 'sub-SCN997_T1w.nii.gz'
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Found 2 DICOM file(s)
+Convert 2 DICOM as /data/neuron/SCN/BIDS/sub-SCN997/fmap/sub-SCN997_dir-ap_epi (96x96x66x2)
+Conversion required 0.081541 seconds (0.070000 for core code).
+Chris Rorden's dcm2niiX version v1.0.20211006  (JP2:OpenJPEG) (JP-LS:CharLS) GCC7.5.0 x86-64 (64-bit Linux)
+Example output filename: 'sub-SCN997_dir-pa_epi.nii.gz'
