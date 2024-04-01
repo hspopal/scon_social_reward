@@ -41,6 +41,8 @@ library(lmerTest)
 require(gridExtra)
 library(multcomp)
 library(plyr)
+library(sjPlot)
+
 ```
 
 ### Define directories
@@ -326,6 +328,19 @@ ggplot(data = rt_data_mod_typ, aes(x=factor(Run), y=Correct_RT_logz, fill=Condit
              position = position_jitterdodge(dodge.width = 0.8)) +
   theme_classic()
 ```
+
+```{r}
+tab_model(model_run_peer_typ)
+```
+
+
+```{r}
+plot_model(model_run_peer_typ, type="pred", terms=c("Run","Condition"), 
+           pred.type="re", ci.lvl=NA) + 
+  theme_classic()
+```
+
+
 
 
 ## Previous Feedback and Run Predicting Reaction Time
