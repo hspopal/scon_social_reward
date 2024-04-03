@@ -19,11 +19,11 @@ from nilearn.glm.first_level import FirstLevelModel
 ##########################################################################
 
 # Take script inputs
-subj = 'sub-SCN'+str(sys.argv[1])
+#subj = 'sub-SCN'+str(sys.argv[1])
 task = 'SR'
 
 # For beta testings
-#subj = 'sub-SCN101'
+subj = 'sub-SCN101'
 #task = 'social'
 
 # Define fmriprep template space
@@ -34,7 +34,7 @@ bids_dir = '/data/neuron/SCN/SR/'
 os.chdir(bids_dir)
 
 # Set output directory
-outp_dir = bids_dir + 'derivatives/SR_first_level/'+subj+'/'
+outp_dir = bids_dir + 'derivatives/SR_univariate/'+subj+'/'
 
 
 ##########################################################################
@@ -196,6 +196,20 @@ for n in range(len(contrasts_df)):
     # Fill the exact condition index in the contrast array with a 1 or -1
     contrasts_bw_conds[cond_a+'_V_'+cond_b][temp_idx_a] = 1
     contrasts_bw_conds[cond_a+'_V_'+cond_b][temp_idx_b] = -1
+
+
+# Conduct positive (HighReward) vs negative (LowReward) contrast
+pos_conds_idx = [dm_cols.index(x) for x in dm_cols if 'HighReward' in x]
+pos_conds = [dm_cols[i] for i in pos_conds_idx]
+pos_conds_idx = [dm_cols.index(x) for x in pos_conds if '-fb' in x]
+
+neg_conds_idx = [dm_cols.index(x) for x in dm_cols if 'LowReward' in x]
+neg_conds = [dm_cols[i] for i in neg_conds_idx]
+neg_conds_idx = [dm_cols.index(x) for x in neg_conds if '-fb' in x]
+
+contrasts_bw_conds['HighReward-fb_V_LowReward-fb'] = np.zeros(len(dm_cols))
+contrasts_bw_conds['HighReward-fb_V_LowReward-fb'][pos_conds_idx] = 1
+contrasts_bw_conds['HighReward-fb_V_LowReward-fb'][neg_conds_idx] = -1
 
 
 # Create contrast maps
