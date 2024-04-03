@@ -25,7 +25,7 @@ subj = 'sub-SCN'+str(sys.argv[1])
 task = 'SR'
 
 # For beta testings
-#subj = 'sub-SCN101'
+#subj = 'sub-SCN215'
 #task = 'social'
 
 # Define fmriprep template space
@@ -74,17 +74,15 @@ event_files.sort()
 fmri_run_data_dir = bids_dir+'derivatives/fmriprep/'+subj+'/func/'
 
 # Set motion parameters to regress out
-motion_reg_names = ['trans_x','trans_y','trans_z','rot_x','rot_y','rot_z']
+motion_reg_names = ['trans_x','trans_y','trans_z','rot_x','rot_y','rot_z',
+                    'trans_x_derivative1','trans_y_derivative1','trans_z_derivative1',
+                    'rot_x_derivative1','rot_y_derivative1','rot_z_derivative1',
+                    'white_matter','csf','scrub']
 confounds = []
 events = []
 
 # Set the relevant conditions (not contrasts)
-relv_conds = ['HighReward_Computer','HighReward_Computer-fb',
-              'HighReward_DisPeer','HighReward_DisPeer-fb',
-              'HighReward_SimPeer','HighReward_SimPeer-fb',
-              'LowReward_Computer','LowReward_Computer-fb',
-              'LowReward_DisPeer','LowReward_DisPeer-fb',
-              'LowReward_SimPeer','LowReward_SimPeer-fb']
+relv_conds = ['RPE', 'RPE_abs', 'ButtonPress']
 
 
 ##########################################################################
@@ -94,6 +92,13 @@ design_matrices = []
 for n in range(len(func_runs)):
     # Set motion parameters and input as a dataframe
     motion_reg = pd.read_csv(fmri_run_data_dir+subj+'_task-'+task+'_run-'+str(n+1)+'_desc-confounds_timeseries.tsv', sep='\t')
+    
+    # Add a regressor to "scrub" TRs with large framewise displacement
+    motion_reg['scrub'] = 0.0
+    motion_reg.loc[motion_reg['framewise_displacement'] > 0.5, 'scrub'] = 1.0
+    
+    # Fill na values
+    motion_reg = motion_reg.fillna(0)
     
     # Filter for just the motion regressors specified above and add to a 
     # general confounds list
@@ -110,8 +115,12 @@ for n in range(len(func_runs)):
     start_time = slice_time_ref * tr
     end_time = (n_scans - 1 + slice_time_ref) * tr
     frame_times = np.linspace(start_time, end_time, n_scans)
-    exp_condition = temp_event_file[['onset','duration','RPE']].to_numpy()
-    signal, _labels = compute_regressor(exp_condition.T, 'spm', frame_times, con_id='RPE')
+    rpe_events = temp_event_file[temp_event_file['trial_type'].str.contains('fb')]
+    rpe_events.loc[:,'RPE_abs'] = list(rpe_events['RPE'].abs())
+    rpe_condition = rpe_events[['onset','duration','RPE']].to_numpy()
+    signal_rpe, _labels = compute_regressor(rpe_condition.T, 'spm', frame_times, con_id='RPE')
+    rpe_abs_condition = rpe_events[['onset','duration','RPE_abs']].to_numpy()
+    signal_rpe_abs, _labels = compute_regressor(rpe_abs_condition.T, 'spm', frame_times, con_id='RPE_abs')
     #test['RPE'] = signal
     
     # Make design matrix
@@ -124,7 +133,13 @@ for n in range(len(func_runs)):
                                                         add_reg_names=confounds[n].columns.tolist())
     
     # Add RPE regressor
-    design_matrix['RPE'] = signal
+    design_matrix.loc[:,'RPE'] = signal_rpe
+    design_matrix.loc[:,'RPE_abs'] = signal_rpe_abs
+    
+    # If the "error" regressor does not exist, add a column of 0s 
+    if 'error' not in design_matrix.columns:
+        design_matrix['error'] = 0
+        
     
     # Remove fb regressors
     design_matrix = design_matrix.loc[:,~design_matrix.columns.str.contains('-fb')]
@@ -153,7 +168,7 @@ for n in range(len(func_runs)):
     # This loop sets a column of 1s for each condition separately, so that
     # each condition can be examined separately 
     contrasts = {}
-    for cond in ['RPE']:
+    for cond in ['RPE', 'RPE_abs', 'ButtonPress']:
         contrasts[cond] = np.zeros(n_conds)
         cond_idx = [design_matrix.columns.to_list().index(cond)]
         contrasts[cond][cond_idx] = 1
