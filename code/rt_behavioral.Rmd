@@ -14,7 +14,7 @@ output:
 ---
 
 ```{r, setup, include=FALSE}
-proj_dir <- '/Users/hpopal/Google Drive/My Drive/dscn_lab/projects/scon_social_reward/'
+proj_dir <- '/Users/haroonpopal/hpopal@umd.edu - Google Drive/My Drive/dscn_lab/projects/scon_social_reward/'
 
 knitr::opts_knit$set(root.dir = proj_dir)
 ```
@@ -156,6 +156,21 @@ rt_data$group <- gsub('1','non-autistic',as.character(rt_data$group))
 rt_data$group <- gsub('2','autistic',as.character(rt_data$group))
 head(rt_data)
 ```
+
+## Demographic info
+```{r}
+demo_info <- read.csv('misc/SCONNChildPacket-IDs_DATA_2024-04-04_1620.csv')
+demo_info <- demo_info[demo_info$redcap_event_name == 'time_1_arm_1', ]
+demo_info$record_id <- toupper(demo_info$record_id)
+
+demo_info <- demo_info[which((demo_info$record_id %in% unique(rt_data_mod_typ$participant_id))==TRUE),]
+
+mean(as.numeric(demo_info$child_exact_age), na.rm=TRUE)
+sd(as.numeric(demo_info$child_exact_age), na.rm=TRUE)
+table(demo_info$child_gender_lab_entered)
+```
+
+
 
 
 ## Missed trials
@@ -340,6 +355,21 @@ plot_model(model_run_peer_typ, type="pred", terms=c("Run","Condition"),
   theme_classic()
 ```
 
+```{r}
+rt_data_mod_typ_means <- aggregate(Correct_RT_logz ~ participant_id * Run * Condition, rt_data_mod_typ, mean)
+
+rt_data_mod_typ_means$Condition <- factor(rt_data_mod_typ_means$Condition, 
+                                          levels=c('SimPeer', 'DisPeer', 'Computer'))
+
+ggplot(data=rt_data_mod_typ_means, aes(x=factor(Run), y=Correct_RT_logz, 
+                                       group=Condition, color=Condition)) + 
+  geom_smooth(method='lm') + 
+  geom_jitter(alpha=0.2) + 
+  scale_color_manual(values=c('#1f77b4', '#ff7f0e', '#2ca02c'),
+                     labels=c('Similar Peer', 'Dissimilar Peer', 'Computer')) + 
+  theme_classic()
+
+```
 
 
 
