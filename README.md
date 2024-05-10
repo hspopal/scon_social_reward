@@ -9,6 +9,7 @@ Contributors: Haroon Popal, Elizabeth Redcay, Victoria Alleluia Shenge
 Run social_reward_modeling.ipynb
 
 ### Neuroimaging
+
 1. Run prep_event_files-rl.py for each subject
      a. Creates a design matrix with a reward prediction error regressor  
 2. Run rl_1st_level-indiv_runs.py for each subject
