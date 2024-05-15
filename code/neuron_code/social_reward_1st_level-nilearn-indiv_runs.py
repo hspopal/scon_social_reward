@@ -94,13 +94,23 @@ events = []
 confounds = []
 design_matrices = []
 
+
+# Create a dictionary that will be used to rename condition variables
+events_rename_dict = {'HighReward':'pos',
+                      'LowReward':'neg',
+                      'Computer':'c',
+                      'SimPeer':'ps',
+                      'DisPeer':'pd',
+                      'fb':'f',
+                      '-':'_'}
+
 # Set the relevant conditions (not contrasts)
-relv_conds = ['HighReward_Computer','HighReward_Computer-fb',
-              'HighReward_DisPeer','HighReward_DisPeer-fb',
-              'HighReward_SimPeer','HighReward_SimPeer-fb',
-              'LowReward_Computer','LowReward_Computer-fb',
-              'LowReward_DisPeer','LowReward_DisPeer-fb',
-              'LowReward_SimPeer','LowReward_SimPeer-fb']
+relv_conds = ['pos_c_i','pos_c_f',
+              'pos_pd_i','pos_pd_f',
+              'pos_ps_i','pos_ps_f',
+              'neg_c_i','neg_c_f',
+              'neg_pd_i','neg_pd_f',
+              'neg_ps_i','neg_ps_f']
 
 
 ##########################################################################
@@ -121,6 +131,16 @@ for n in range(len(subj_qc_data)):
                               'SCN_'+subj[-3:], subj+'_task-'+task+'_run-'+run_num+'_desc-events'+'.csv')
     event_file = pd.read_csv(event_path)
     event_file = event_file[event_file['trial_type'].str.contains('fixation') == False]
+    
+    # Rename trial type conditions
+    for key in events_rename_dict.keys():
+       event_file['trial_type'] = event_file['trial_type'].str.replace(key,
+                                                                       events_rename_dict[key])
+    
+    for n in event_file.index:
+        if event_file.loc[n, 'trial_type'].split('_')[-1] != 'f':
+            event_file.loc[n, 'trial_type'] = event_file.loc[n, 'trial_type'] + '_i'
+    
     events.append(event_file)
     
     # Set motion parameters and input as a dataframe
@@ -212,16 +232,42 @@ for n_cont in range(len(contrasts)):
 # Create specific contrasts
 ##############################################################################
 
-# Create a list of conditions that will be tested against each other
-# The index of each list will be the contrast (e.g. cond_a_list[0] > cond_b_list[0])
-cond_a_list = ['HighReward_SimPeer-fb', 'HighReward_SimPeer-fb', 
-               'HighReward_SimPeer', 'HighReward_SimPeer', 
-               'LowReward_DisPeer', 'LowReward_DisPeer-fb']
-cond_b_list = ['HighReward_DisPeer-fb', 'HighReward_Computer-fb', 
-               'HighReward_DisPeer', 'HighReward_Computer',
-               'LowReward_Computer', 'LowReward_Computer-fb']
-contrasts_df = pd.DataFrame(list(zip(cond_a_list, cond_b_list)), 
-                            columns=['cond_a','cond_b'])
+# Create a dictionary that has contrasts names and how we are defining them
+# Each key indicates how we will refer to the contrast
+# Each item is a list of two lists
+# The first list indicates the conditions that will be greater than the conditions
+# of the second list (conditions_list_1 > conditions_list_2)
+contrasts_dict = {'all_pVc_f':[['pos_ps_f','neg_ps_f','pos_pd_f','neg_pd_f'], 
+                               ['pos_c_f','neg_c_f']],
+                  'pos_pVc_f':[['pos_ps_f','pos_pd_f'],
+                               ['pos_c_f']],
+                  'neg_pVc_f':[['neg_ps_f','neg_pd_f'],
+                               ['neg_c_f']],
+                  'pos_psVc_f':[['pos_ps_f'],
+                                ['pos_c_f']],
+                  'neg_pdVc_f':[['neg_pd_f'],
+                                ['neg_c_f']],
+                  'posVneg_a_f':[['pos_ps_f','pos_pd_f','pos_c_f'],
+                                 ['neg_ps_f','neg_pd_f','neg_c_f']],
+                  'posVneg_p_f':[['pos_ps_f','pos_pd_f'],
+                                 ['neg_ps_f','neg_pd_f']],
+                  'posVneg_c_f':[['pos_c_f'],
+                                 ['neg_c_f']],
+                  'posVneg_ps_f':[['pos_ps_f'],
+                                  ['neg_ps_f']],
+                  'posVneg_pd_f':[['pos_pd_f'],
+                                  ['neg_pd_f']],
+                  'all_pVc_i':[['pos_ps_i','neg_ps_f','pos_pd_i','neg_pd_i'],
+                               ['pos_c_i','neg_c_i']],
+                  'all_psVc_i':[['pos_ps_i','neg_ps_i'],
+                                ['pos_c_i','neg_c_i']],
+                  'all_pdVc_i':[['pos_pd_i','neg_pd_i'],
+                                ['pos_c_i','neg_c_i']],
+                  'all_psVpd_i':[['pos_ps_i','neg_ps_i'],
+                                 ['pos_pd_i','neg_pd_i']]
+                  }
+
+
 
 # Create a dictionary that will store the contrast arrays
 contrasts_bw_conds = {}
@@ -229,41 +275,41 @@ contrasts_bw_conds = {}
 dm_cols = list(design_matrices[0].columns)
 
 # Loop through and fill in 1s and 0s for contrasts
-for n in range(len(contrasts_df)):
-    # Find the condition names to be contrasted
-    cond_a = contrasts_df.loc[n,'cond_a']
-    cond_b = contrasts_df.loc[n,'cond_b']
-    
+for key in contrasts_dict.keys():
     # Create an array of zeros
-    contrasts_bw_conds[cond_a+'_V_'+cond_b] = np.zeros(len(dm_cols))
+    contrasts_bw_conds[key] = np.zeros(len(dm_cols))
     
-    # Find the index of each condtion as defined before
-    temp_idx_a = dm_cols.index(cond_a)
-    temp_idx_b = dm_cols.index(cond_b)
-    
-    # Fill the exact condition index in the contrast array with a 1 or -1
-    contrasts_bw_conds[cond_a+'_V_'+cond_b][temp_idx_a] = 1
-    contrasts_bw_conds[cond_a+'_V_'+cond_b][temp_idx_b] = -1
+    for cond_a in contrasts_dict[key][0]:
+        # Find the index of each condtion as defined before
+        temp_idx_a = dm_cols.index(cond_a)
+        
+        # Fill the exact condition index in the contrast array with a 1
+        contrasts_bw_conds[key][temp_idx_a] = 1
+        
+    for cond_b in contrasts_dict[key][1]:
+        # Find the index of each condtion as defined before
+        temp_idx_b = dm_cols.index(cond_b)
+        
+        # Fill the exact condition index in the contrast array with a -1
+        contrasts_bw_conds[key][temp_idx_b] = -1
 
 
-# Conduct positive (HighReward) vs negative (LowReward) contrast
-pos_conds_idx = [dm_cols.index(x) for x in dm_cols if 'HighReward' in x]
-pos_conds = [dm_cols[i] for i in pos_conds_idx]
-pos_conds_idx = [dm_cols.index(x) for x in pos_conds if '-fb' in x]
+from nilearn.plotting import plot_contrast_matrix
+from matplotlib import pyplot as plt
 
-neg_conds_idx = [dm_cols.index(x) for x in dm_cols if 'LowReward' in x]
-neg_conds = [dm_cols[i] for i in neg_conds_idx]
-neg_conds_idx = [dm_cols.index(x) for x in neg_conds if '-fb' in x]
-
-contrasts_bw_conds['HighReward-fb_V_LowReward-fb'] = np.zeros(len(dm_cols))
-contrasts_bw_conds['HighReward-fb_V_LowReward-fb'][pos_conds_idx] = 1
-contrasts_bw_conds['HighReward-fb_V_LowReward-fb'][neg_conds_idx] = -1
 
 
 # Create contrast maps
 for n_cont in range(len(contrasts_bw_conds)):
     cont_name = list(contrasts_bw_conds.keys())[n_cont]
-    z_map = fmri_glm.compute_contrast(contrasts_bw_conds[cont_name], output_type='z_score')
+    
+    # S a plot of the contrast matrix
+    plot_contrast_matrix(contrasts_bw_conds[cont_name], 
+                         design_matrix=design_matrices[0])
+    plt.savefig(os.path.join(outp_dir, cont_name+'.png'))
+    
+    z_map = fmri_glm.compute_contrast(contrasts_bw_conds[cont_name], 
+                                      output_type='z_score')
 
     z_map.to_filename(os.path.join(outp_dir,'zmap_'+task+'_'+cont_name+'_run-all.nii.gz'))
 
