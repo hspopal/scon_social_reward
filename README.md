@@ -2,6 +2,13 @@
 Contributors: Haroon Popal, Elizabeth Redcay, Victoria Alleluia Shenge
 
 
+# Set Up
+- `qc_participants.ipynb`
+  - For each subject, list the runs that have passed experimentor quality control
+  - Output: participants_good.csv
+    - A list of subject IDs and runs that are "good"
+
+
 # Analyses
 
 ## Reinforcement Learning
