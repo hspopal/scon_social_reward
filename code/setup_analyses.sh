@@ -16,9 +16,16 @@ subj_list=( 101 102 103 104 105 106 107 108 109 110
             242 244 246 249 250 253 )
 
 
+
+
+
 # Create event files for first level design matrices
 for subj in "${subj_list[@]}"; do 
     python code/hpopal/prep_event_files.py $subj
+done
+
+for subj in "${subj_list[@]}"; do 
+    python code/hpopal/prep_event_files-rl.py $subj
 done
 
 # Create grey matter masks for each subject
@@ -32,6 +39,9 @@ for subj in "${subj_list[@]}"; do
     python code/hpopal/social_reward_1st_level-nilearn-indiv_runs.py $subj
 done
 
+for subj in "${subj_list[@]}"; do 
+    python code/hpopal/rl_1st_level-indiv_runs.py $subj
+done
 
 
 ##########################################################################
