@@ -3,10 +3,15 @@ Contributors: Haroon Popal, Elizabeth Redcay, Victoria Alleluia Shenge
 
 
 # Set Up
-- `qc_participants.ipynb`
+- `prep_participants_lists.ipynb`
   - For each subject, list the runs that have passed experimentor quality control
-  - Output: participants_good.csv
-    - A list of subject IDs and runs that are "good"
+  - Output:
+    - participants_good.csv
+      - A list of subject IDs and runs that are "good" based on fMRI QC
+    - participants_good-min_task_errors.csv
+      - Same as above except, participants are only included if they had 5 or less task errors
+    - participants_good-no_task_errors.csv
+      - Same as above except, participants are only included if they had no task errors
 
 
 # Analyses
