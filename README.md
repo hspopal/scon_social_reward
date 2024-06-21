@@ -7,7 +7,7 @@ Contributors: Haroon Popal, Elizabeth Redcay, Victoria Alleluia Shenge
   - The social reward fMRI task had a bug which changed trials from some participants, in which their interest was shown as a disinterest or vice-versa
   - This results in a lot of participants being presented "wrong answers" and some participants getting a lot of wrong answers
   - This notebook examines each participants data, and produces:
-    - A spreadsheet for the number of errors for each participant
+    - A spreadsheet for the number of errors for each participant - `answer_errors_sum.csv`
     - A duplicate of the task output files, for each participant, for each run, with a column indicating whether the trial was "wrong" or not (this can be used as a regressor in the first level fMRI analysis)
 - `prep_participants_lists.ipynb`
   - For each subject, list the runs that have passed experimentor quality control
