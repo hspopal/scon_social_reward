@@ -13,7 +13,7 @@ Contributors: Haroon Popal, Elizabeth Redcay, Victoria Alleluia Shenge
   - Combines participant metadata from various sources (e.g. MRI QC, demographics) and outputs a series of TSV or CSVs which can be used as participant lists
   - This allows you to know which participants to use in analyses, and how that list was created, in a transparent manner
   - Output:
-    - `participants.tsv'
+    - `participants.tsv`
       - "Tab-seperated values" format (it's like a CSV, except it uses tabs as delimintators) list of all participants which have a completed an MRI session (even with only a portion of the session completed)
     - `participants-qc.csv`
       - A list of subject IDs and runs that are "good" based on the lab's MRI QC protocol
