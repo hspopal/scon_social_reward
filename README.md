@@ -3,7 +3,7 @@ Contributors: Haroon Popal, Elizabeth Redcay, Victoria Alleluia Shenge
 
 
 # Set Up
-- `task_audit.ipynb`
+- [`task_audit.ipynb`](https://github.com/hspopal/scon_social_reward/blob/main/code/task_audit.ipynb)
   - The social reward fMRI task had a bug which changed trials from some participants, in which their interest was shown as a disinterest or vice-versa
   - This results in a lot of participants being presented "wrong answers" and some participants getting a lot of wrong answers
   - This notebook examines each participants data, and produces:
