@@ -43,6 +43,7 @@ library(multcomp)
 library(plyr)
 library(sjPlot)
 library(data.table)
+library(stringi)
 
 ```
 
@@ -501,91 +502,6 @@ print(paste(round(prop_learn, 4)*100, '% of participants had faster RTs for tria
 ```{r}
 t.test(r4_peer_diff_typ$pos_neg_RT, alternative = "two.sided", var.equal = FALSE)
 ```
-
-
-
-## Post-Task Questionnaire
-
-```{r}
-pre_post_data <- read.csv('derivatives/behavioral/SCONNPreAndPostTest-PreAndPostData_DATA_2024-06-07_1515.csv')
-
-#pre_post_data <- subset(pre_post_data, 'SCN' %in% record_id)
-pre_post_data <- pre_post_data[startsWith(pre_post_data$record_id, 'SCN_'),]
-
-# Convert to long format
-pre_post_data_long <- melt(setDT(pre_post_data), id.vars = c("record_id"), variable.name = "question")
-
-head(pre_post_data_long)
-```
-
-presim1: How much are you interested in learning about Similar Peer?
-predis1: How much are you interested in learning about Dissimilar Peer?
-presim2: How much do you think you would want to spend time with Similar Peer if you knew them in real life?
-predis2: How much do you think you would want to spend time with Dissimilar Peer if you knew them in real life?
-presim3: How similar do you think you are to Similar Peer?
-presim3: How similar do you think you are to Dissimilar Peer?
-postsim1: How do you feel about Similar Peer?
-postdis1: How do you feel about Dissimilar Peer?
-postsim2: How much do you have in common with Similar Peer?
-postdis2: How much do you have in common with Dissimilar Peer?
-postsim3: How much would you want to spend time with Similar Peer if you knew them in real life?
-postdis3: How much would you want to spend time with Dissimilar Peer if you knew them in real life?
-postsim4: How much did you want to learn about Similar Peer?
-postdis4: How much did you want to learn about Dissimilar Peer?
-postcomp: How much did you want to learn about the computer?
-postwhomost: Who or what did you like learning about the most?
-
-
-
-```{r}
-temp_df <- subset(pre_post_data_long, question %in% c('postsim1','postdis1'))
-
-plot1 <- ggplot(temp_df, aes(x=value, color=question)) + geom_bar(stat='mean') + theme_classic()
-
-plot2 <- ggplot(temp_df, aes(x=value, hue=question)) + geom_histogram() + theme_classic()
-
-grid.arrange(plot1, plot2, ncol=2)
-```
-
-
-Split variable names
-```{r}
-pre_post_data_long$time_point <- ""
-pre_post_data_long$peer <- ""
-pre_post_data_long$item <- ""
-
-for (n in 1:nrow(pre_post_data_long)) {
-  if (grepl( 'pre', pre_post_data_long$question[n], fixed = TRUE)) {
-    pre_post_data_long$time_point[n] <- 'pre'
-  } else {
-    pre_post_data_long$time_point[n] <- 'post'
-  }
-  
-  if (grepl( 'sim', pre_post_data_long$question[n], fixed = TRUE)) {
-    pre_post_data_long$peer[n] <- 'sim'
-  } else if (grepl( 'dis', pre_post_data_long$question[n], fixed = TRUE)) {
-    pre_post_data_long$peer[n] <- 'dis'
-  }
-  
-  pre_post_data_long$item[n] <- stri_sub(pre_post_data_long$question[n], -1)
-}
-```
-
-
-
-
-
-```{r}
-ggplot(data = subset(pre_post_data_long, question %in% c('presim3', 'predis3', 
-                                                         'postsim2','postdis3')), 
-       aes(x=question, y=value, fill=peer)) + 
-  geom_boxplot(outlier.shape = NA) + 
-  theme_classic()
-```
-
-
-
-
 
 
 
