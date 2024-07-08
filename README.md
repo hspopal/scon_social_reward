@@ -30,11 +30,11 @@ Contributors: Haroon Popal, Elizabeth Redcay, Victoria Alleluia Shenge
 
 
 ## Univariate Analyses
-- [`prep_event_files.py`](https://github.com/hspopal/scon_social_reward/blob/main/code/prep_event_files.py)
+- [`prep_event_files.py`](https://github.com/hspopal/scon_social_reward/blob/main/code/neuron_code/prep_event_files.py)
     - Prep event files from the psychopy task output to be in the correct format for nilearn
-- [`create_gm_brain_mask.py`](https://github.com/hspopal/scon_social_reward/blob/main/code/create_gm_brain_mask.py)
+- [`create_gm_brain_mask.py`](https://github.com/hspopal/scon_social_reward/blob/main/code/neuron_code/create_gm_brain_mask.py)
     - Uses the fmriprep output to create a grey matter mask for each participant
-- [`social_reward_1st_level-nilearn-indiv_runs.py`](https://github.com/hspopal/scon_social_reward/blob/main/code/social_reward_1st_level-nilearn-indiv_runs.py)
+- [`social_reward_1st_level-nilearn-indiv_runs.py`](https://github.com/hspopal/scon_social_reward/blob/main/code/neuron_code/social_reward_1st_level-nilearn-indiv_runs.py)
     - Run the first level analysis for each participant, for the social reward task
     - First level here refers to creating whole-brain beta maps for each participant
     - This script creates beta maps for each condition, for each run, and averaged together (each condition for each participant)
