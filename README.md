@@ -26,7 +26,7 @@ Contributors: Haroon Popal, Elizabeth Redcay, Victoria Alleluia Shenge
 # Analyses
 
 ## General
-`setup_analyses.sh` contains helpful code to get things generally set up in the terminal, such as a subjects list to run for loops, and code to run the individual analysis scripts.
+[`setup_analyses.sh`](https://github.com/hspopal/scon_social_reward/blob/main/code/setup_analyses.sh) contains helpful code to get things generally set up in the terminal, such as a subjects list to run for loops, and code to run the individual analysis scripts.
 
 
 ## Univariate Analyses
