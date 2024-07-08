@@ -1,0 +1,215 @@
+---
+title: "Pre and Post Task Questionnaire"
+author: "Haroon Popal"
+date: "`r Sys.Date()`"
+output:   
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    number_sections: true
+    df_print: paged
+    css: !expr here::here("code/style.css")
+
+---
+
+```{r, setup, include=FALSE}
+proj_dir <- '/Users/hpopal/Google Drive/My Drive/dscn_lab/projects/scon_social_reward/'
+
+knitr::opts_knit$set(root.dir = proj_dir)
+```
+
+## Setup Up
+
+### Import Packages
+```{r, message=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(emmeans)
+library(lmerTest)
+require(gridExtra)
+library(multcomp)
+library(plyr)
+library(sjPlot)
+library(data.table)
+library(stringi)
+
+```
+
+# Post-Task Questionnaire
+
+```{r}
+# Import data
+pre_post_data <- read.csv('derivatives/behavioral/SCONNPreAndPostTest-SRPreAndPostTaskQues_DATA_2024-06-28_1512.csv')
+
+# Capitalize all participant IDs
+pre_post_data$record_id <- toupper(pre_post_data$record_id)
+
+# Only include participants with valid
+pre_post_data <- pre_post_data[startsWith(pre_post_data$record_id, 'SCN_'),]
+
+# Only include complete cases
+pre_post_data <-pre_post_data[complete.cases(pre_post_data),]
+
+
+# Convert to long format
+pre_post_data_long <- melt(setDT(pre_post_data), id.vars = c("record_id"), variable.name = "question")
+
+# Convert values to be numeric
+pre_post_data_long$value <- as.numeric(pre_post_data_long$value)
+
+head(pre_post_data_long)
+```
+
+pre1:   How much are you interested in learning about [peername1]?
+pre2:   How much are you interested in learning about [peername2]?
+pre3:   How much do you think you would want to spend time with [peername1] if you knew them in real life?
+pre4:   How much do you think you would want to spend time with [peername2] if you knew them in real life?
+pre5:   How similar do you think you are to [peername1]?
+pre6:   How similar do you think you are to [peername2]?
+post1:	How do you feel about [peername1]?
+post2:	How do you feel about [peername2]?
+post3:	How much do you have in common with [peername1]?
+post4:	How much do you have in common with [peername2]?
+post5:	How much would you want to spend time with [peername1] if you knew them in real life?
+post6:	How much would you want to spend time with [peername2] if you knew them in real life?
+post7:	How much did you want to learn about [peername1]?
+post8:	How much did you want to learn about [peername2]?
+post9:	How much did you want to learn about the computer?
+post10:	Who or what did you like learning about the most?
+post11:	How did it feel when you got a thumbs up?
+post12:	How did it feel when you got a thumbs down?
+post13:	How did it feel when you got a check mark?
+post14:	How did it feel when you got a X?
+post15:	Is there anything else you want to tell us about the task?
+
+
+### Add original questions
+```{r}
+qs_short <- c('pre1', 'pre2', 'pre3', 'pre4', 'pre5', 'pre6', 
+              'post1', 'post2', 'post3', 'post4', 'post5', 'post6', 
+              'post7', 'post8', 'post9', 'post10', 'post11', 'post12', 'post13',
+              'post14', 'post15')
+qs_long <- c('How much are you interested in learning about [peername1]?',
+             'How much are you interested in learning about [peername2]?',
+             'How much do you think you would want to spend time with [peername1] if you knew them in real life?',
+             'How much do you think you would want to spend time with [peername2] if you knew them in real life?',
+             'How similar do you think you are to [peername1]?',
+             'How similar do you think you are to [peername2]?',
+             'How do you feel about [peername1]?',
+             'How do you feel about [peername2]?',
+             'How much do you have in common with [peername1]?',
+             'How much do you have in common with [peername2]?',
+             'How much would you want to spend time with [peername1] if you knew them in real life?',
+             'How much would you want to spend time with [peername2] if you knew them in real life?',
+             'How much did you want to learn about [peername1]?',
+             'How much did you want to learn about [peername2]?',
+             'How much did you want to learn about the computer?',
+             'Who or what did you like learning about the most?',
+             'How did it feel when you got a thumbs up?',
+             'How did it feel when you got a thumbs down?',
+             'How did it feel when you got a check mark?',
+             'How did it feel when you got a X?',
+             'Is there anything else you want to tell us about the task?')
+
+pre_post_data_long$question_long <- ''
+
+for (n_q in 1:length(qs_short)) {
+  pre_post_data_long[pre_post_data_long$question == qs_short[n_q]]$question_long <- qs_long[n_q]
+}
+
+```
+
+
+
+
+```{r}
+temp_df <- subset(pre_post_data_long, question %in% c('post1','post2'))
+
+ggplot(temp_df, aes(x=value, fill=question)) + geom_histogram() + theme_classic()
+
+```
+
+
+Split variable names
+```{r}
+pre_post_data_long$time_point <- ""
+pre_post_data_long$peer <- ""
+pre_post_data_long$item <- ""
+
+for (n in 1:nrow(pre_post_data_long)) {
+  if (grepl( 'pre', pre_post_data_long$question[n], fixed = TRUE)) {
+    pre_post_data_long$time_point[n] <- 'pre'
+  } else {
+    pre_post_data_long$time_point[n] <- 'post'
+  }
+  
+  if (grepl( 'peername1', pre_post_data_long$question_long[n], fixed = TRUE)) {
+    pre_post_data_long$peer[n] <- 'similar'
+  } else if (grepl( 'peername2', pre_post_data_long$question_long[n], fixed = TRUE)) {
+    pre_post_data_long$peer[n] <- 'dissimilar'
+  }
+  
+  pre_post_data_long$item[n] <- stri_sub(pre_post_data_long$question[n], -1)
+}
+```
+
+
+
+
+
+```{r}
+ggplot(data = subset(pre_post_data_long, question %in% c('pre5', 'pre6', 
+                                                         'post3','post4')), 
+       aes(x=question, y=value, fill=peer)) + 
+  geom_boxplot(outlier.shape = NA) + 
+  theme_classic()
+```
+
+
+### Similarity
+```{r}
+plot1 <- ggplot(data = subset(pre_post_data_long, question %in% c('pre5', 
+                                                                  'post3')), 
+                aes(x=question, y=value, group=record_id)) + 
+         geom_point() + 
+         geom_line() + 
+         theme_classic() + 
+         scale_x_discrete(name ="Similarity/Commonality to Similar Peer")
+
+plot2 <- ggplot(data = subset(pre_post_data_long, question %in% c('pre6',
+                                                                  'post4')), 
+                aes(x=question, y=value, group=record_id)) + 
+         geom_point() + 
+         geom_line() + 
+         theme_classic() + 
+         scale_x_discrete(name ="Similarity/Commonality to Dissimilar Peer")
+
+grid.arrange(plot1, plot2, ncol=2)
+
+```
+
+
+
+```{r}
+plot1 <- ggplot(data = subset(pre_post_data_long, question %in% c('pre5', 
+                                                                  'post3')), 
+                aes(x=question, y=value, group=record_id)) + 
+         geom_point() + 
+         geom_line() + 
+         theme_classic() + 
+         scale_x_discrete(name ="Similarity/Commonality to Similar Peer")
+
+plot2 <- ggplot(data = subset(pre_post_data_long, question %in% c('pre6',
+                                                                  'post4')), 
+                aes(x=question, y=value, group=record_id)) + 
+         geom_point() + 
+         geom_line() + 
+         theme_classic() + 
+         scale_x_discrete(name ="Similarity/Commonality to Dissimilar Peer")
+
+grid.arrange(plot1, plot2, ncol=2)
+
+```
+
