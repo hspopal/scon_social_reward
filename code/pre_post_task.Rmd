@@ -39,9 +39,17 @@ library(stringi)
 
 # Post-Task Questionnaire
 
+## Clean Up
+One issue with the questionnaire is that we are not sure who is the positive or negative peer. So we will import the psychopy data for each participant and verify whether "Charlie" or "Shiloh" is the positive or negative peer. 
+
+
 ```{r}
+redcap_report_list = list.files('derivatives/behavioral/', 
+                                pattern="^SCONNPreAndPostTest-SRPreAndPostTaskQues_DATA",
+                                full.names = TRUE)
+
 # Import data
-pre_post_data <- read.csv('derivatives/behavioral/SCONNPreAndPostTest-SRPreAndPostTaskQues_DATA_2024-06-28_1512.csv')
+pre_post_data <- read.csv(redcap_report_list)
 
 # Capitalize all participant IDs
 pre_post_data$record_id <- toupper(pre_post_data$record_id)
@@ -51,10 +59,157 @@ pre_post_data <- pre_post_data[startsWith(pre_post_data$record_id, 'SCN_'),]
 
 # Only include complete cases
 pre_post_data <-pre_post_data[complete.cases(pre_post_data),]
+```
 
 
+## Import PsychoPy Data
+```{r}
+pre_post_data$simpeer <- ''
+pre_post_data$dispeer <- ''
+
+for (subj in pre_post_data$record_id) {
+  task_data_list = list.files(paste('derivatives/task_socialreward/data/',
+                                    subj, '/', sep = ''), 
+                                  pattern="SR_SCN_*",
+                                  full.names = TRUE)
+  
+  subj_simpeers <- list()
+  subj_dispeers <- list()
+  
+  if (length(task_data_list) > 0) {
+    for (run_file in task_data_list) {
+      # Read the first file
+      task_data <- read.csv(run_file)
+      
+      # Check which name is used for the similar peer condition
+      task_simpeer_names <- task_data[task_data$ConditionName %like% "SimPeer", ]$peerName
+      task_dispeer_names <- task_data[task_data$ConditionName %like% "DisPeer", ]$peerName
+      
+      run_simpeer <- unique(task_simpeer_names)
+      run_dispeer <- unique(task_dispeer_names)
+      
+      subj_simpeers[length(subj_simpeers)+1] <- run_simpeer
+      subj_dispeers[length(subj_dispeers)+1] <- run_dispeer
+    }
+    
+    pre_post_data[pre_post_data$record_id == subj,]$simpeer <- unique(subj_simpeers[[1]])
+    pre_post_data[pre_post_data$record_id == subj,]$dispeer <- unique(subj_dispeers[[1]])
+  }
+}
+
+# Remove missing data
+pre_post_data <- pre_post_data[pre_post_data$simpeer != '',]
+```
+
+
+### Visualize distribution of names
+```{r}
+peer_names_long <- melt(setDT(pre_post_data), id.vars = c("record_id"), 
+                        measure.vars =  c('simpeer','dispeer'), 
+                        variable.name = "peer_condition")
+
+ggplot(peer_names_long, aes(x = peer_condition, fill = value))+geom_bar(position = 'dodge', 
+                                                                        stat = "count")
+```
+
+Double check the more recent participants
+```{r}
+peer_names_long_recent <- subset(peer_names_long, grepl("SCN_2", peer_names_long$record_id))
+
+ggplot(peer_names_long_recent, aes(x = peer_condition, fill = value))+geom_bar(position = 'dodge', 
+                                                                        stat = "count")
+```
+
+
+## Fixing Peer Names
+One issue with this task is that peername1 and peername2 were arbitrarily assigned. These need to be recoded so that peername1 refers to the similar peer and peername2 refers to the dissimilar peer. Going forward, simpeer and dispeer will be used to refer to peername1 and peername2, respectively. 
+
+```{r}
+pre_post_data_fx <- data.frame(simpeer = character(),
+                               dispeer = character(),
+                               learn_simpeer_pre = integer(),
+                               learn_dispeer_pre = integer(),
+                               time_simpeer_pre = integer(),
+                               time_dispeer_pre = integer(),
+                               similar_simpeer_pre = integer(),
+                               similar_dispeer_pre = integer(),
+                               feel_simpeer_post = integer(),
+                               feel_dispeer_post = integer(),
+                               common_simpeer_post = integer(),
+                               common_dispeer_post = integer(),
+                               time_simpeer_post = integer(),
+                               time_dispeer_post = integer(),
+                               learn_simpeer_post = integer(),
+                               learn_dispeer_post = integer(),
+                               learn_computer_post = integer(),
+                               learn_most_post = character(),
+                               thumbs_up_post = integer(),
+                               thumbs_down_post = integer(),
+                               check_mark_post = integer(),
+                               x_post = integer(),
+                               other_comments = character())
+
+
+
+
+for (n in 1:nrow(pre_post_data)) {
+  # Create an empty row
+  pre_post_data_fx[n,] <- NA
+  
+  # Fill in data that doesn't change
+  pre_post_data_fx$record_id[n] <- pre_post_data$record_id[n]
+  pre_post_data_fx$learn_computer_post[n] <- pre_post_data$post9[n]
+  pre_post_data_fx$learn_most_post[n] <- pre_post_data$post10[n]
+  pre_post_data_fx$thumbs_up_post[n] <- pre_post_data$post11[n]
+  pre_post_data_fx$thumbs_down_post[n] <- pre_post_data$post12[n]
+  pre_post_data_fx$check_mark_post[n] <- pre_post_data$post13[n]
+  pre_post_data_fx$x_post[n] <- pre_post_data$post14[n]
+  pre_post_data_fx$other_comments[n] <- pre_post_data$post15[n]
+  
+  # If actual simpeer matches peername1, keep the same data
+  if (pre_post_data$peername1[n] == pre_post_data$simpeer[n]) {
+    pre_post_data_fx$simpeer[n] <- pre_post_data$simpeer[n]
+    pre_post_data_fx$dispeer[n] <- pre_post_data$dispeer[n]
+    pre_post_data_fx$learn_simpeer_pre[n] <- pre_post_data$pre1[n]
+    pre_post_data_fx$learn_dispeer_pre[n] <- pre_post_data$pre2[n]
+    pre_post_data_fx$time_simpeer_pre[n] <- pre_post_data$pre3[n]
+    pre_post_data_fx$time_dispeer_pre[n] <- pre_post_data$pre4[n]
+    pre_post_data_fx$similar_simpeer_pre[n] <- pre_post_data$pre5[n]
+    pre_post_data_fx$similar_dispeer_pre[n] <- pre_post_data$pre6[n]
+    pre_post_data_fx$feel_simpeer_post[n] <- pre_post_data$post1[n]
+    pre_post_data_fx$feel_dispeer_post[n] <- pre_post_data$post2[n]
+    pre_post_data_fx$common_simpeer_post[n] <- pre_post_data$post3[n]
+    pre_post_data_fx$common_dispeer_post[n] <- pre_post_data$post4[n]
+    pre_post_data_fx$time_simpeer_post[n] <- pre_post_data$post5[n]
+    pre_post_data_fx$time_dispeer_post[n] <- pre_post_data$post6[n]
+    pre_post_data_fx$learn_simpeer_post[n] <- pre_post_data$post7[n]
+    pre_post_data_fx$learn_dispeer_post[n] <- pre_post_data$post8[n]
+  } else if (pre_post_data$peername1[n] == pre_post_data$dispeer[n]) {
+    pre_post_data_fx$simpeer[n] <- pre_post_data$dispeer[n]
+    pre_post_data_fx$dispeer[n] <- pre_post_data$simpeer[n]
+    pre_post_data_fx$learn_simpeer_pre[n] <- pre_post_data$pre2[n]
+    pre_post_data_fx$learn_dispeer_pre[n] <- pre_post_data$pre1[n]
+    pre_post_data_fx$time_simpeer_pre[n] <- pre_post_data$pre4[n]
+    pre_post_data_fx$time_dispeer_pre[n] <- pre_post_data$pre3[n]
+    pre_post_data_fx$similar_simpeer_pre[n] <- pre_post_data$pre6[n]
+    pre_post_data_fx$similar_dispeer_pre[n] <- pre_post_data$pre5[n]
+    pre_post_data_fx$feel_simpeer_post[n] <- pre_post_data$post2[n]
+    pre_post_data_fx$feel_dispeer_post[n] <- pre_post_data$post1[n]
+    pre_post_data_fx$common_simpeer_post[n] <- pre_post_data$post4[n]
+    pre_post_data_fx$common_dispeer_post[n] <- pre_post_data$post3[n]
+    pre_post_data_fx$time_simpeer_post[n] <- pre_post_data$post6[n]
+    pre_post_data_fx$time_dispeer_post[n] <- pre_post_data$post5[n]
+    pre_post_data_fx$learn_simpeer_post[n] <- pre_post_data$post8[n]
+    pre_post_data_fx$learn_dispeer_post[n] <- pre_post_data$post7[n]
+  }
+}
+```
+
+
+
+```{r}
 # Convert to long format
-pre_post_data_long <- melt(setDT(pre_post_data), id.vars = c("record_id"), variable.name = "question")
+pre_post_data_long <- melt(setDT(pre_post_data_fx), id.vars = c("record_id"), variable.name = "question")
 
 # Convert values to be numeric
 pre_post_data_long$value <- as.numeric(pre_post_data_long$value)
@@ -86,7 +241,7 @@ post15:	Is there anything else you want to tell us about the task?
 
 
 ### Add original questions
-```{r}
+```{r eval = FALSE, echo = FALSE}
 qs_short <- c('pre1', 'pre2', 'pre3', 'pre4', 'pre5', 'pre6', 
               'post1', 'post2', 'post3', 'post4', 'post5', 'post6', 
               'post7', 'post8', 'post9', 'post10', 'post11', 'post12', 'post13',
@@ -124,7 +279,7 @@ for (n_q in 1:length(qs_short)) {
 
 
 
-```{r}
+```{r eval = FALSE, echo = FALSE}
 temp_df <- subset(pre_post_data_long, question %in% c('post1','post2'))
 
 ggplot(temp_df, aes(x=value, fill=question)) + geom_histogram() + theme_classic()
@@ -136,22 +291,22 @@ Split variable names
 ```{r}
 pre_post_data_long$time_point <- ""
 pre_post_data_long$peer <- ""
-pre_post_data_long$item <- ""
+#pre_post_data_long$item <- ""
 
 for (n in 1:nrow(pre_post_data_long)) {
   if (grepl( 'pre', pre_post_data_long$question[n], fixed = TRUE)) {
     pre_post_data_long$time_point[n] <- 'pre'
-  } else {
+  } else if (grepl( 'post', pre_post_data_long$question[n], fixed = TRUE)) {
     pre_post_data_long$time_point[n] <- 'post'
   }
   
-  if (grepl( 'peername1', pre_post_data_long$question_long[n], fixed = TRUE)) {
+  if (grepl( 'simpeer', pre_post_data_long$question[n], fixed = TRUE)) {
     pre_post_data_long$peer[n] <- 'similar'
-  } else if (grepl( 'peername2', pre_post_data_long$question_long[n], fixed = TRUE)) {
+  } else if (grepl( 'dispeer', pre_post_data_long$question[n], fixed = TRUE)) {
     pre_post_data_long$peer[n] <- 'dissimilar'
   }
   
-  pre_post_data_long$item[n] <- stri_sub(pre_post_data_long$question[n], -1)
+  #pre_post_data_long$item[n] <- stri_sub(pre_post_data_long$question[n], -1)
 }
 ```
 
@@ -160,56 +315,101 @@ for (n in 1:nrow(pre_post_data_long)) {
 
 
 ```{r}
-ggplot(data = subset(pre_post_data_long, question %in% c('pre5', 'pre6', 
-                                                         'post3','post4')), 
-       aes(x=question, y=value, fill=peer)) + 
-  geom_boxplot(outlier.shape = NA) + 
-  theme_classic()
-```
-
-
-### Similarity
-```{r}
-plot1 <- ggplot(data = subset(pre_post_data_long, question %in% c('pre5', 
-                                                                  'post3')), 
-                aes(x=question, y=value, group=record_id)) + 
-         geom_point() + 
-         geom_line() + 
-         theme_classic() + 
-         scale_x_discrete(name ="Similarity/Commonality to Similar Peer")
-
-plot2 <- ggplot(data = subset(pre_post_data_long, question %in% c('pre6',
-                                                                  'post4')), 
-                aes(x=question, y=value, group=record_id)) + 
-         geom_point() + 
-         geom_line() + 
-         theme_classic() + 
-         scale_x_discrete(name ="Similarity/Commonality to Dissimilar Peer")
-
-grid.arrange(plot1, plot2, ncol=2)
+ggplot(data = subset(pre_post_data_long, question %in% c('thumbs_up_post', 'thumbs_down_post', 
+                                                         'check_mark_post','x_post')), 
+                aes(x=question, y=value)) + 
+         geom_boxplot(outlier.shape = NA) + 
+         theme_classic()
 
 ```
 
 
 
 ```{r}
-plot1 <- ggplot(data = subset(pre_post_data_long, question %in% c('pre5', 
-                                                                  'post3')), 
+plot1 <- ggplot(data = subset(pre_post_data_long, question %in% c('learn_simpeer_pre', 
+                                                                  'learn_dispeer_pre',
+                                                                  'learn_simpeer_post',
+                                                                  'learn_dispeer_post')), 
+                aes(x=question, y=value, fill=peer)) + 
+         geom_boxplot(outlier.shape = NA) + 
+         theme_classic() + 
+         theme(legend.position="none") + 
+         ggtitle("Interest in Learning") + 
+         xlab("") + 
+         scale_x_discrete(labels=c("Pre","Pre","Post","Post","Post")) + 
+         scale_fill_brewer(palette="Dark2")
+
+plot2 <- ggplot(data = subset(pre_post_data_long, question %in% c('time_simpeer_pre', 'time_dispeer_pre', 
+                                                         'time_simpeer_post','time_dispeer_post')), 
+                aes(x=question, y=value, fill=peer)) + 
+         geom_boxplot(outlier.shape = NA) + 
+         theme_classic() + 
+         theme(legend.position="none") + 
+         ggtitle("Spending Time") + 
+         xlab("") + 
+         scale_x_discrete(labels=c("Pre","Pre","Post","Post")) + 
+         scale_fill_brewer(palette="Dark2") + 
+         ylab("")
+
+plot3 <- ggplot(data = subset(pre_post_data_long, question %in% c('similar_simpeer_pre', 'similar_dispeer_pre', 
+                                                         'common_simpeer_post','common_dispeer_post')), 
+                aes(x=question, y=value, fill=peer)) + 
+         geom_boxplot(outlier.shape = NA) + 
+         theme_classic() + 
+         theme(legend.position="none") + 
+         ggtitle("Similarity") + 
+         xlab("") + 
+         scale_x_discrete(labels=c("Pre","Pre","Post","Post")) + 
+         scale_fill_brewer(palette="Dark2")
+
+plot4 <- ggplot(data = subset(pre_post_data_long, question %in% c('similar_simpeer_pre', 
+                                                                  'common_simpeer_post')), 
                 aes(x=question, y=value, group=record_id)) + 
          geom_point() + 
          geom_line() + 
          theme_classic() + 
-         scale_x_discrete(name ="Similarity/Commonality to Similar Peer")
+         scale_x_discrete(name ="Similar Peer", labels=c("Pre","Post")) + 
+         theme(legend.position="none") + 
+         ggtitle("Similarity") + 
+         scale_fill_brewer(palette="Dark2") + 
+         ylab("")
 
-plot2 <- ggplot(data = subset(pre_post_data_long, question %in% c('pre6',
-                                                                  'post4')), 
+plot5 <- ggplot(data = subset(pre_post_data_long, question %in% c('similar_dispeer_pre',
+                                                                  'common_dispeer_post')), 
                 aes(x=question, y=value, group=record_id)) + 
          geom_point() + 
          geom_line() + 
          theme_classic() + 
-         scale_x_discrete(name ="Similarity/Commonality to Dissimilar Peer")
+         scale_x_discrete(name ="Dissimilar Peer", labels=c("Pre","Post")) + 
+         theme(legend.position="none") + 
+         ggtitle("Similarity") + 
+         scale_fill_brewer(palette="Dark2") + 
+         ylab("")
 
-grid.arrange(plot1, plot2, ncol=2)
 
+plot6 <- ggplot(data = subset(pre_post_data_long, question %in% c('feel_simpeer_post', 'feel_dispeer_post')), 
+                aes(x=question, y=value, fill=peer)) + 
+         geom_boxplot(outlier.shape = NA) + 
+         theme_classic() + 
+         ggtitle("Valence (post)") + 
+         xlab("") + 
+         theme(axis.text.x = element_blank()) + 
+         scale_fill_brewer(palette="Dark2") + 
+         ylab("")
+
+
+
+grid.arrange(plot1, plot2, plot6, 
+             plot3, plot4, plot5, ncol=3)
 ```
+
+
+## Create a list of the "learners"
+```{r}
+sim_learn <- pre_post_data_fx[pre_post_data_fx$common_simpeer_post > pre_post_data_fx$similar_simpeer_pre,]
+sim_learn[,c('record_id','similar_simpeer_pre', 'common_simpeer_post')]
+```
+
+
+
 
