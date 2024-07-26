@@ -312,8 +312,9 @@ for (n in 1:nrow(pre_post_data_long)) {
 
 
 
+# Results
 
-
+## Feedback Value
 ```{r}
 ggplot(data = subset(pre_post_data_long, question %in% c('thumbs_up_post', 'thumbs_down_post', 
                                                          'check_mark_post','x_post')), 
@@ -324,7 +325,7 @@ ggplot(data = subset(pre_post_data_long, question %in% c('thumbs_up_post', 'thum
 ```
 
 
-
+## Pre and Post Peer Sentiment
 ```{r}
 plot1 <- ggplot(data = subset(pre_post_data_long, question %in% c('learn_simpeer_pre', 
                                                                   'learn_dispeer_pre',
