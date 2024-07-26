@@ -408,9 +408,25 @@ grid.arrange(plot1, plot2, plot6,
 ## Create a list of the "learners"
 ```{r}
 sim_learn <- pre_post_data_fx[pre_post_data_fx$common_simpeer_post > pre_post_data_fx$similar_simpeer_pre,]
-sim_learn[,c('record_id','similar_simpeer_pre', 'common_simpeer_post')]
+print(nrow(sim_learn))
+head(sim_learn[,c('record_id','similar_simpeer_pre', 'common_simpeer_post')])
+
 ```
 
 
+```{r}
+dis_learn <- pre_post_data_fx[pre_post_data_fx$common_dispeer_post > pre_post_data_fx$similar_dispeer_pre,]
+print(nrow(dis_learn))
+head(dis_learn[,c('record_id','similar_dispeer_pre', 'common_dispeer_post')])
+
+```
+
+
+```{r}
+all_learn <- merge(sim_learn, dis_learn, by = 'record_id')
+print(nrow(all_learn))
+head(all_learn)
+
+```
 
 
