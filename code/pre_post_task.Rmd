@@ -34,8 +34,11 @@ library(plyr)
 library(sjPlot)
 library(data.table)
 library(stringi)
+library(ggpubr)
 
 ```
+
+
 
 # Post-Task Questionnaire
 
@@ -62,7 +65,7 @@ pre_post_data <-pre_post_data[complete.cases(pre_post_data),]
 ```
 
 
-## Import PsychoPy Data
+### Import PsychoPy Data
 ```{r}
 pre_post_data$simpeer <- ''
 pre_post_data$dispeer <- ''
@@ -121,7 +124,7 @@ ggplot(peer_names_long_recent, aes(x = peer_condition, fill = value))+geom_bar(p
 ```
 
 
-## Fixing Peer Names
+### Fixing Peer Names
 One issue with this task is that peername1 and peername2 were arbitrarily assigned. These need to be recoded so that peername1 refers to the similar peer and peername2 refers to the dissimilar peer. Going forward, simpeer and dispeer will be used to refer to peername1 and peername2, respectively. 
 
 ```{r}
@@ -312,6 +315,7 @@ for (n in 1:nrow(pre_post_data_long)) {
 
 
 
+***
 # Results
 
 ## Feedback Value
@@ -326,83 +330,118 @@ ggplot(data = subset(pre_post_data_long, question %in% c('thumbs_up_post', 'thum
 
 
 ## Pre and Post Peer Sentiment
+
 ```{r}
-plot1 <- ggplot(data = subset(pre_post_data_long, question %in% c('learn_simpeer_pre', 
-                                                                  'learn_dispeer_pre',
-                                                                  'learn_simpeer_post',
-                                                                  'learn_dispeer_post')), 
-                aes(x=question, y=value, fill=peer)) + 
+pre_post_data_long_clean <- data.frame(pre_post_data_long)
+pre_post_data_long_clean <- pre_post_data_long_clean[complete.cases(pre_post_data_long_clean), ]
+
+# Remove substring
+pre_post_data_long_clean$question <- gsub("_pre", "", pre_post_data_long_clean$question)
+pre_post_data_long_clean$question <- gsub("_post", "", pre_post_data_long_clean$question)
+
+head(pre_post_data_long_clean)
+```
+
+
+### ANOVA
+```{r}
+task_peer_mod <- lmer(value ~ peer*time_point + (1 + peer*time_point | record_id),
+                       data=pre_post_data_long_clean)
+summary(task_peer_mod)
+```
+
+
+### Visualization
+```{r, fig.width=8}
+# Define color palette
+color_palette <- c("#E6AB02","#A6761D")
+
+
+# Reorder variable for plotting
+pre_post_data_long_clean$time_point <- factor(pre_post_data_long_clean$time_point, 
+                                              levels = c("pre", "post"))
+
+
+plot1 <- ggplot(data = subset(pre_post_data_long_clean, 
+                              question %in% c('learn_simpeer', 'learn_dispeer')), 
+                aes(x=peer, y=value, fill=time_point, z=question)) + 
          geom_boxplot(outlier.shape = NA) + 
          theme_classic() + 
          theme(legend.position="none") + 
          ggtitle("Interest in Learning") + 
          xlab("") + 
-         scale_x_discrete(labels=c("Pre","Pre","Post","Post","Post")) + 
-         scale_fill_brewer(palette="Dark2")
+         scale_fill_manual(values = color_palette) + 
+         labs(fill = 'Time Point')
+         #scale_color_grey(start = 0.5, end = 0.2)
 
-plot2 <- ggplot(data = subset(pre_post_data_long, question %in% c('time_simpeer_pre', 'time_dispeer_pre', 
-                                                         'time_simpeer_post','time_dispeer_post')), 
-                aes(x=question, y=value, fill=peer)) + 
+plot2 <- ggplot(data = subset(pre_post_data_long_clean, 
+                              question %in% c('time_simpeer', 'time_dispeer')), 
+                aes(x=peer, y=value, fill=time_point, z=question)) + 
          geom_boxplot(outlier.shape = NA) + 
          theme_classic() + 
          theme(legend.position="none") + 
          ggtitle("Spending Time") + 
          xlab("") + 
-         scale_x_discrete(labels=c("Pre","Pre","Post","Post")) + 
-         scale_fill_brewer(palette="Dark2") + 
-         ylab("")
+         ylab("") + 
+         scale_fill_manual(values = color_palette) + 
+         labs('Time Point')
+         #scale_x_discrete(labels=c("Pre","Pre","Post","Post")) + 
+         #scale_fill_brewer(palette="Dark2") + 
+         
 
-plot3 <- ggplot(data = subset(pre_post_data_long, question %in% c('similar_simpeer_pre', 'similar_dispeer_pre', 
-                                                         'common_simpeer_post','common_dispeer_post')), 
-                aes(x=question, y=value, fill=peer)) + 
+plot3 <- ggplot(data = subset(pre_post_data_long_clean, 
+                              question %in% c('similar_simpeer', 'similar_dispeer', 
+                                              'common_simpeer','common_dispeer')), 
+                aes(x=peer, y=value, fill=time_point, z=question)) + 
          geom_boxplot(outlier.shape = NA) + 
          theme_classic() + 
          theme(legend.position="none") + 
          ggtitle("Similarity") + 
          xlab("") + 
-         scale_x_discrete(labels=c("Pre","Pre","Post","Post")) + 
-         scale_fill_brewer(palette="Dark2")
+         scale_fill_manual(values = color_palette) 
 
-plot4 <- ggplot(data = subset(pre_post_data_long, question %in% c('similar_simpeer_pre', 
-                                                                  'common_simpeer_post')), 
-                aes(x=question, y=value, group=record_id)) + 
+plot4 <- ggplot(data = subset(pre_post_data_long_clean, question %in% c('similar_simpeer', 
+                                                                  'common_simpeer')), 
+                aes(x=time_point, y=value, group=record_id)) + 
          geom_point() + 
          geom_line() + 
          theme_classic() + 
          scale_x_discrete(name ="Similar Peer", labels=c("Pre","Post")) + 
          theme(legend.position="none") + 
          ggtitle("Similarity") + 
-         scale_fill_brewer(palette="Dark2") + 
+         scale_fill_manual(values = color_palette) + 
          ylab("")
 
-plot5 <- ggplot(data = subset(pre_post_data_long, question %in% c('similar_dispeer_pre',
-                                                                  'common_dispeer_post')), 
-                aes(x=question, y=value, group=record_id)) + 
+plot5 <- ggplot(data = subset(pre_post_data_long_clean, question %in% c('similar_dispeer',
+                                                                  'common_dispeer')), 
+                aes(x=time_point, y=value, group=record_id)) + 
          geom_point() + 
          geom_line() + 
          theme_classic() + 
          scale_x_discrete(name ="Dissimilar Peer", labels=c("Pre","Post")) + 
          theme(legend.position="none") + 
          ggtitle("Similarity") + 
-         scale_fill_brewer(palette="Dark2") + 
+         scale_fill_manual(values = color_palette) + 
          ylab("")
 
 
-plot6 <- ggplot(data = subset(pre_post_data_long, question %in% c('feel_simpeer_post', 'feel_dispeer_post')), 
-                aes(x=question, y=value, fill=peer)) + 
+plot6 <- ggplot(data = subset(pre_post_data_long_clean, question %in% c('feel_simpeer', 'feel_dispeer')), 
+                aes(x=peer, y=value, z=question, fill=time_point)) + 
          geom_boxplot(outlier.shape = NA) + 
          theme_classic() + 
          ggtitle("Valence (post)") + 
          xlab("") + 
-         theme(axis.text.x = element_blank()) + 
-         scale_fill_brewer(palette="Dark2") + 
+         #theme(axis.text.x = element_blank()) + 
+         scale_fill_manual(values = c("#A6761D")) + 
          ylab("")
 
+common_legend <- get_legend(plot1)
 
-
-grid.arrange(plot1, plot2, plot6, 
-             plot3, plot4, plot5, ncol=3)
+ggarrange(plot1, plot2, plot6, 
+          plot3, plot4, plot5, 
+          ncol=3, nrow=2, common.legend = TRUE, legend="bottom")
 ```
+
 
 
 ## Create a list of the "learners"
@@ -410,7 +449,6 @@ grid.arrange(plot1, plot2, plot6,
 sim_learn <- pre_post_data_fx[pre_post_data_fx$common_simpeer_post > pre_post_data_fx$similar_simpeer_pre,]
 print(nrow(sim_learn))
 head(sim_learn[,c('record_id','similar_simpeer_pre', 'common_simpeer_post')])
-
 ```
 
 
@@ -428,5 +466,280 @@ print(nrow(all_learn))
 head(all_learn)
 
 ```
+
+
+### Export participant list for "Learners"
+```{r}
+# Import original participants list
+participants_orig <- read.csv('participants.tsv', sep = '\t')
+
+# Add prefix to match subject ids
+sim_learn$participant_id <- paste0('sub-', sim_learn$record_id)
+
+# Remove underscore from subject ids
+sim_learn$participant_id <- gsub("_", "", sim_learn$participant_id)
+
+# Filter for only participants who learned the similar peer
+participants_sim_learn <- participants_orig[participants_orig$participant_id %in% sim_learn$participant_id, ]
+
+# Export
+write.csv(participants_sim_learn, 'derivatives/participants-task-sim_learn.csv',
+          row.names = FALSE)
+```
+
+
+
+***
+# Group Differences
+
+```{r}
+# Import group identifiers
+demo_info <- read.csv('participants.tsv', sep = '\t')
+
+# Remove 'sub-' prefix from participant IDs
+demo_info$participant_id<-gsub("sub-","",as.character(demo_info$participant_id))
+demo_info$participant_id<-gsub("SCN","SCN_",as.character(demo_info$participant_id))
+
+head(demo_info)
+```
+
+
+```{r}
+pre_post_data_long_clean$group <- ''
+
+for (subj_id in unique(pre_post_data_long_clean$record_id)) {
+  if (nrow(demo_info[demo_info$participant_id == subj_id, ]) == 0) {
+    next
+  } else {
+    temp_group <- demo_info[demo_info$participant_id == subj_id, ]$group
+    
+    pre_post_data_long_clean[pre_post_data_long_clean$record_id == subj_id, ]$group <- temp_group
+  }
+} 
+```
+
+
+## ANOVA
+```{r}
+task_group_mod <- lmer(value ~ peer*time_point*group + (1 + peer*time_point*group | record_id),
+                       data=pre_post_data_long_clean)
+summary(task_group_mod)
+```
+
+
+## Visualization
+```{r}
+# Make a subset of data without blank group data
+pre_post_data_long_group <- pre_post_data_long_clean[pre_post_data_long_clean$group != "",]
+
+plot1 <- ggplot(data = subset(pre_post_data_long_group, 
+                              question %in% c('learn_simpeer', 'learn_dispeer')), 
+                aes(x=peer, y=value, fill=group, alpha=factor(time_point), z=question)) + 
+         geom_boxplot(outlier.shape = NA) + 
+         theme_classic() + 
+         theme(legend.position="none") + 
+         ggtitle("Interest in Learning") + 
+         xlab("") + 
+         scale_fill_brewer(palette="Dark2") + 
+         scale_alpha_discrete(guide = guide_legend(override.aes = list(fill = "black"))) +
+         labs(alpha = 'Time Point', fill = 'Group')
+
+plot2 <- ggplot(data = subset(pre_post_data_long_group, 
+                              question %in% c('time_simpeer', 'time_dispeer')), 
+                aes(x=peer, y=value, fill=group, alpha=time_point, z=question)) + 
+         geom_boxplot(outlier.shape = NA) + 
+         theme_classic() + 
+         theme(legend.position="none") + 
+         ggtitle("Spending Time") + 
+         xlab("") + 
+         scale_fill_brewer(palette="Dark2") + 
+         ylab("")
+
+plot3 <- ggplot(data = subset(pre_post_data_long_group, 
+                              question %in% c('similar_simpeer', 'similar_dispeer', 
+                                              'common_simpeer','common_dispeer')), 
+                aes(x=peer, y=value, fill=group, alpha=time_point, z=question)) + 
+         geom_boxplot(outlier.shape = NA) + 
+         theme_classic() + 
+         theme(legend.position="none") + 
+         ggtitle("Similarity") + 
+         xlab("") + 
+         scale_fill_brewer(palette="Dark2")
+
+plot4 <- ggplot(data = subset(pre_post_data_long_group, 
+                              question %in% c('similar_simpeer', 'common_simpeer')), 
+                aes(x=time_point, y=value, group=record_id, color=group)) + 
+         geom_point() + 
+         geom_line() + 
+         theme_classic() + 
+         scale_x_discrete(name ="Similar Peer", labels=c("Pre","Post")) + 
+         theme(legend.position="none") + 
+         ggtitle("Similarity") + 
+         scale_color_brewer(palette="Dark2") + 
+         ylab("")
+
+plot5 <- ggplot(data = subset(pre_post_data_long_group, 
+                              question %in% c('similar_dispeer', 'common_dispeer')), 
+                aes(x=time_point, y=value, group=record_id, color=group)) + 
+         geom_point() + 
+         geom_line() + 
+         theme_classic() + 
+         scale_x_discrete(name ="Dissimilar Peer", labels=c("Pre","Post")) + 
+         theme(legend.position="none") + 
+         ggtitle("Similarity") + 
+         scale_color_brewer(palette="Dark2") + 
+         ylab("")
+
+
+plot6 <- ggplot(data = subset(pre_post_data_long_group, 
+                              question %in% c('feel_simpeer', 'feel_dispeer')), 
+                aes(x=peer, y=value, fill=group, z=question)) + 
+         geom_boxplot(outlier.shape = NA) + 
+         theme_classic() + 
+         ggtitle("Valence (post)") + 
+         xlab("") + 
+         scale_fill_brewer(palette="Dark2") + 
+         ylab("")
+
+
+
+ggarrange(plot1, plot2, plot6, 
+          plot3, plot4, plot5, 
+          ncol=3, nrow=2, common.legend = TRUE, legend = 'bottom')
+```
+
+
+
+***
+# PsychoPy Task Error Analysis
+Are there differences between participants who had task errors and those that did not?
+
+```{r}
+# Import task error data
+task_errors <- read.csv('derivatives/task_socialreward/data/answer_errors_sum.csv')
+
+task_errors$num_errors <- as.numeric(task_errors$num_errors)
+
+head(task_errors)
+```
+
+
+```{r}
+pre_post_data_long_clean$errors <- ''
+
+for (n_row in 1:nrow(pre_post_data_long_clean)) {
+  temp_subj_id <- pre_post_data_long_clean$record_id[n_row]
+  temp_n_errors <- task_errors[task_errors$X == temp_subj_id, 'num_errors']
+  
+  if (temp_n_errors > 0) {
+    pre_post_data_long_clean[n_row, 'errors'] <- 'some'
+  } else {
+    pre_post_data_long_clean[n_row, 'errors'] <- 'none'
+  }
+}
+
+pre_post_data_long_error <- pre_post_data_long_clean[pre_post_data_long_clean$error != "",]
+```
+
+
+## ANOVA
+```{r}
+task_mod <- lmer(value ~ peer*time_point + (1 + peer*time_point | record_id),
+                       data=pre_post_data_long_error)
+
+task_error_mod <- lmer(value ~ peer*time_point*errors + (1 + peer*time_point*errors | record_id),
+                       data=pre_post_data_long_error)
+summary(task_error_mod)
+```
+
+```{r}
+anova(task_mod, task_error_mod, test="Chisq")
+```
+
+**Summary: No significant effect for errors, and having errors in the model makes it worse.**
+
+
+```{r}
+# Define color palette
+color_palette <- c("#7570B3", "#E7298A")
+
+plot1 <- ggplot(data = subset(pre_post_data_long_error, 
+                              question %in% c('learn_simpeer', 'learn_dispeer')), 
+                aes(x=peer, y=value, fill=errors, alpha=factor(time_point), z=question)) + 
+         geom_boxplot(outlier.shape = NA) + 
+         theme_classic() + 
+         theme(legend.position="none") + 
+         ggtitle("Interest in Learning") + 
+         xlab("") + 
+         scale_fill_manual(values = color_palette) + 
+         scale_alpha_discrete(guide = guide_legend(override.aes = list(fill = "black"))) +
+         labs(alpha = 'Time Point', fill = 'Errors')
+
+plot2 <- ggplot(data = subset(pre_post_data_long_error, 
+                              question %in% c('time_simpeer', 'time_dispeer')), 
+                aes(x=peer, y=value, fill=errors, alpha=time_point, z=question)) + 
+         geom_boxplot(outlier.shape = NA) + 
+         theme_classic() + 
+         theme(legend.position="none") + 
+         ggtitle("Spending Time") + 
+         xlab("") + 
+         scale_fill_manual(values = color_palette) + 
+         ylab("")
+
+plot3 <- ggplot(data = subset(pre_post_data_long_error, 
+                              question %in% c('similar_simpeer', 'similar_dispeer', 
+                                              'common_simpeer','common_dispeer')), 
+                aes(x=peer, y=value, fill=errors, alpha=time_point, z=question)) + 
+         geom_boxplot(outlier.shape = NA) + 
+         theme_classic() + 
+         theme(legend.position="none") + 
+         ggtitle("Similarity") + 
+         xlab("") + 
+         scale_fill_manual(values = color_palette)
+
+plot4 <- ggplot(data = subset(pre_post_data_long_error, 
+                              question %in% c('similar_simpeer', 'common_simpeer')), 
+                aes(x=time_point, y=value, group=record_id, color=errors)) + 
+         geom_point() + 
+         geom_line() + 
+         theme_classic() + 
+         scale_x_discrete(name ="Similar Peer", labels=c("Pre","Post")) + 
+         theme(legend.position="none") + 
+         ggtitle("Similarity") + 
+         scale_color_manual(values = color_palette) + 
+         ylab("")
+
+plot5 <- ggplot(data = subset(pre_post_data_long_error, 
+                              question %in% c('similar_dispeer', 'common_dispeer')), 
+                aes(x=time_point, y=value, group=record_id, color=errors)) + 
+         geom_point() + 
+         geom_line() + 
+         theme_classic() + 
+         scale_x_discrete(name ="Dissimilar Peer", labels=c("Pre","Post")) + 
+         theme(legend.position="none") + 
+         ggtitle("Similarity") + 
+         scale_color_manual(values = color_palette) + 
+         ylab("")
+
+
+plot6 <- ggplot(data = subset(pre_post_data_long_error, 
+                              question %in% c('feel_simpeer', 'feel_dispeer')), 
+                aes(x=peer, y=value, fill=errors, z=question)) + 
+         geom_boxplot(outlier.shape = NA) + 
+         theme_classic() + 
+         ggtitle("Valence (post)") + 
+         xlab("") + 
+         scale_fill_manual(values = color_palette) + 
+         ylab("")
+
+
+
+ggarrange(plot1, plot2, plot6, 
+          plot3, plot4, plot5, 
+          ncol=3, nrow=2, common.legend = TRUE, legend = 'bottom')
+```
+
+
+
 
 
