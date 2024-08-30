@@ -31,10 +31,14 @@ library(lmerTest)
 require(gridExtra)
 library(multcomp)
 library(plyr)
-library(sjPlot)
 library(data.table)
 library(stringi)
 library(ggpubr)
+library(sjPlot)
+library(sjmisc)
+library(sjlabelled)
+library(lme4)
+
 
 ```
 
@@ -344,10 +348,44 @@ head(pre_post_data_long_clean)
 
 
 ### ANOVA
+
+Create a separate dataframe from each question
 ```{r}
-task_peer_mod <- lmer(value ~ peer*time_point + (1 + peer*time_point | record_id),
-                       data=pre_post_data_long_clean)
-summary(task_peer_mod)
+data_learn <- subset(pre_post_data_long_clean, 
+                     question %in% c('learn_simpeer', 'learn_dispeer'))
+
+data_time <- subset(pre_post_data_long_clean, 
+                    question %in% c('time_simpeer', 'time_dispeer'))
+
+data_similar <- subset(pre_post_data_long_clean, 
+                       question %in% c('similar_simpeer', 'similar_dispeer', 
+                                       'common_simpeer','common_dispeer'))
+
+data_valence <- subset(pre_post_data_long_clean, 
+                       question %in% c('feel_simpeer', 'feel_dispeer'))
+```
+
+
+```{r}
+mod_learn <- lmer(value ~ peer*time_point + (1 | record_id),
+                       data=data_learn)
+mod_time <- lmer(value ~ peer*time_point + (1 | record_id),
+                       data=data_time)
+mod_similar <- lmer(value ~ peer*time_point + (1 | record_id),
+                       data=data_similar)
+mod_valence <- lmer(value ~ peer + (1 | record_id),
+                       data=data_valence)
+
+# Convert the class of the lmer output
+#class(mod_learn) <- "lmerMod"
+#class(mod_time) <- "lmerMod"
+#class(mod_similar) <- "lmerMod"
+#class(mod_valence) <- "lmerMod"
+
+tab_model(mod_learn, mod_time, mod_similar, mod_valence,
+          dv.labels = c("Interest in Learning", "Spending Time", "Similarity", 
+                        'Valence'),
+          file = 'derivatives/behavioral/pre_post_anova_table.html')
 ```
 
 
@@ -520,10 +558,43 @@ for (subj_id in unique(pre_post_data_long_clean$record_id)) {
 
 
 ## ANOVA
+Create a separate dataframe from each question
 ```{r}
-task_group_mod <- lmer(value ~ peer*time_point*group + (1 + peer*time_point*group | record_id),
-                       data=pre_post_data_long_clean)
-summary(task_group_mod)
+data_learn <- subset(pre_post_data_long_clean, 
+                     question %in% c('learn_simpeer', 'learn_dispeer'))
+
+data_time <- subset(pre_post_data_long_clean, 
+                    question %in% c('time_simpeer', 'time_dispeer'))
+
+data_similar <- subset(pre_post_data_long_clean, 
+                       question %in% c('similar_simpeer', 'similar_dispeer', 
+                                       'common_simpeer','common_dispeer'))
+
+data_valence <- subset(pre_post_data_long_clean, 
+                       question %in% c('feel_simpeer', 'feel_dispeer'))
+```
+
+
+```{r}
+mod_learn_group <- lmer(value ~ peer*time_point*group + (1 | record_id),
+                       data=data_learn)
+mod_time_group <- lmer(value ~ peer*time_point*group + (1 | record_id),
+                       data=data_time)
+mod_similar_group <- lmer(value ~ peer*time_point*group + (1 | record_id),
+                       data=data_similar)
+mod_valence_group <- lmer(value ~ peer*group + (1 | record_id),
+                       data=data_valence)
+
+# Convert the class of the lmer output
+#class(mod_learn) <- "lmerMod"
+#class(mod_time) <- "lmerMod"
+#class(mod_similar) <- "lmerMod"
+#class(mod_valence) <- "lmerMod"
+
+tab_model(mod_learn_group, mod_time_group, mod_similar_group, mod_valence_group,
+          dv.labels = c("Interest in Learning", "Spending Time", "Similarity", 
+                        'Valence'),
+          file = 'derivatives/behavioral/pre_post_anova_table_group.html')
 ```
 
 
@@ -643,18 +714,41 @@ pre_post_data_long_error <- pre_post_data_long_clean[pre_post_data_long_clean$er
 
 
 ## ANOVA
-```{r}
-task_mod <- lmer(value ~ peer*time_point + (1 + peer*time_point | record_id),
-                       data=pre_post_data_long_error)
 
-task_error_mod <- lmer(value ~ peer*time_point*errors + (1 + peer*time_point*errors | record_id),
-                       data=pre_post_data_long_error)
-summary(task_error_mod)
+Create a separate dataframe from each question
+```{r}
+data_learn_error <- subset(pre_post_data_long_error, 
+                     question %in% c('learn_simpeer', 'learn_dispeer'))
+
+data_time_error <- subset(pre_post_data_long_error, 
+                    question %in% c('time_simpeer', 'time_dispeer'))
+
+data_similar_error <- subset(pre_post_data_long_error, 
+                       question %in% c('similar_simpeer', 'similar_dispeer', 
+                                       'common_simpeer','common_dispeer'))
+
+data_valence_error <- subset(pre_post_data_long_error, 
+                       question %in% c('feel_simpeer', 'feel_dispeer'))
 ```
 
+
 ```{r}
-anova(task_mod, task_error_mod, test="Chisq")
+mod_learn_error <- lmer(value ~ peer*time_point*errors + (1 | record_id),
+                       data=data_learn_error)
+mod_time_error <- lmer(value ~ peer*time_point*errors + (1 | record_id),
+                       data=data_time_error)
+mod_similar_error <- lmer(value ~ peer*time_point*errors + (1 | record_id),
+                       data=data_similar_error)
+mod_valence_error <- lmer(value ~ peer*errors + (1 | record_id),
+                       data=data_valence_error)
+
+
+tab_model(mod_learn_error, mod_time_error, mod_similar_error, mod_valence_error,
+          dv.labels = c("Interest in Learning", "Spending Time", "Similarity", 
+                        'Valence'),
+          file = 'derivatives/behavioral/pre_post_anova_table_error.html')
 ```
+
 
 **Summary: No significant effect for errors, and having errors in the model makes it worse.**
 
