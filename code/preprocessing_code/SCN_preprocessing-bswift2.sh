@@ -76,7 +76,7 @@ uname=$USER  # Record your directory ID/username
 proj_dir=/data/neuron/SCN
 dicom_dir="$proj_dir"/dicom/  # Where dicom file goes on neuron
 nifti_dir=${proj_dir}/BIDS/sub-SCN${subID}
-SCN_bswift=/data/bswift-1/"${uname}"/SCN/fmriprep/  # fmriprep data should go to this folder on bswift
+SCN_bswift=/data/software-research/"${uname}"/SCN/fmriprep/  # fmriprep data should go to this folder on bswift
 
 # Navigate to the project directory
 cd $proj_dir
@@ -98,7 +98,7 @@ function neuron2bswift ()
 {
 from_path=$1
 to_path=$2
-server_path=${uname}@login.bswift.umd.edu
+server_path=${uname}@bswift2-login.umd.edu
 #ssh ${server_path} "[ ! -d $to_path ] && mkdir $to_path && mkdir $to_path_BIDS"
 scp -r "${from_path}" "${server_path}":"$to_path"BIDS/
 }
@@ -180,7 +180,7 @@ then
         echo ------------------------
 
         # Submit fmriprep sbatch on bswift
-        ssh ${uname}@login.bswift.umd.edu "sbatch --export=indir="$SCN_bswift",uname="$uname",subID="$subID" --job-name=SCN"$subID" --mail-user="${uname}"@umd.edu --output="$SCN_bswift"/log/sub-SCN"$subID".log /data/bswift-1/hpopal/SCN/code/fmriprep_SCN.sh"
+        ssh ${uname}@bswift2-login.umd.edu "sbatch --export=indir="$SCN_bswift",uname="$uname",subID="$subID" --job-name=SCN"$subID" --mail-user="${uname}"@umd.edu --output="$SCN_bswift"/log/sub-SCN"$subID".log /data/software-research/hpopal/SCN/code/fmriprep_SCN-bswift2.sh"
 
 
     elif $rerun_fmriprep
@@ -194,7 +194,7 @@ then
         echo ------------------------
 
         # Submit fmriprep sbatch on bswift
-        ssh ${uname}@login.bswift.umd.edu "sbatch --export=indir="$SCN_bswift",uname="$uname",subID="$subID" --job-name=SCN"$subID" --mail-user="${uname}"@umd.edu --output="$SCN_bswift"/log/sub-SCN"$subID".log /data/bswift-1/hpopal/SCN/code/fmriprep_SCN.sh"
+        ssh ${uname}@bswift2-login.umd.edu "sbatch --export=indir="$SCN_bswift",uname="$uname",subID="$subID" --job-name=SCN"$subID" --mail-user="${uname}"@umd.edu --output="$SCN_bswift"/log/sub-SCN"$subID".log /data/software-research/hpopal/SCN/code/fmriprep_SCN-bswift2.sh"
     
     else
         echo ------------------------
@@ -211,9 +211,9 @@ cd ${proj_dir}
 if $transfer_bswift2neuron
 then
     BID_ID=sub-SCN$subID
-    indir=/data/bswift-1/"${uname}"/SCN 
+    indir=/data/software-research/"${uname}"/SCN 
 
-    ssh ${uname}@login.bswift.umd.edu "sh /data/bswift-1/oliver/SCN/code/data_transfer.sh "$BID_ID" "$indir"" 
+    ssh ${uname}@bswift2-login.umd.edu "sh /data/software-research/hpopal/SCN/code/data_transfer.sh "$BID_ID" "$indir"" 
 
     # Change permissions to fmriprep files so everyone can edit
     chgrp -R psyc-dscn-data ${proj_dir}/fmriprep_out/fmriprep/$BID_ID
