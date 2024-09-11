@@ -51,7 +51,7 @@ One issue with the questionnaire is that we are not sure who is the positive or 
 
 
 ```{r}
-redcap_report_list = list.files('derivatives/behavioral/', 
+redcap_report_list = list.files('derivatives/pre_post_task_survey/', 
                                 pattern="^SCONNPreAndPostTest-SRPreAndPostTaskQues_DATA",
                                 full.names = TRUE)
 
@@ -385,7 +385,7 @@ mod_valence <- lmer(value ~ peer + (1 | record_id),
 tab_model(mod_learn, mod_time, mod_similar, mod_valence,
           dv.labels = c("Interest in Learning", "Spending Time", "Similarity", 
                         'Valence'),
-          file = 'derivatives/behavioral/pre_post_anova_table.html')
+          file = 'derivatives/pre_post_task_survey/pre_post_anova_table.html')
 ```
 
 
@@ -521,7 +521,25 @@ sim_learn$participant_id <- gsub("_", "", sim_learn$participant_id)
 participants_sim_learn <- participants_orig[participants_orig$participant_id %in% sim_learn$participant_id, ]
 
 # Export
-write.csv(participants_sim_learn, 'derivatives/participants-task-sim_learn.csv',
+write.csv(participants_sim_learn, 'derivatives/pre_post_task_survey/participants-task-sim_learn.csv',
+          row.names = FALSE)
+```
+
+```{r}
+# Import original participants list
+participants_orig <- read.csv('participants.tsv', sep = '\t')
+
+# Add prefix to match subject ids
+dis_learn$participant_id <- paste0('sub-', dis_learn$record_id)
+
+# Remove underscore from subject ids
+dis_learn$participant_id <- gsub("_", "", dis_learn$participant_id)
+
+# Filter for only participants who learned the similar peer
+participants_dis_learn <- participants_orig[participants_orig$participant_id %in% dis_learn$participant_id, ]
+
+# Export
+write.csv(participants_dis_learn, 'derivatives/pre_post_task_survey/participants-task-dis_learn.csv',
           row.names = FALSE)
 ```
 
@@ -594,7 +612,7 @@ mod_valence_group <- lmer(value ~ peer*group + (1 | record_id),
 tab_model(mod_learn_group, mod_time_group, mod_similar_group, mod_valence_group,
           dv.labels = c("Interest in Learning", "Spending Time", "Similarity", 
                         'Valence'),
-          file = 'derivatives/behavioral/pre_post_anova_table_group.html')
+          file = 'derivatives/pre_post_task_survey/pre_post_anova_table_group.html')
 ```
 
 
@@ -746,7 +764,7 @@ mod_valence_error <- lmer(value ~ peer*errors + (1 | record_id),
 tab_model(mod_learn_error, mod_time_error, mod_similar_error, mod_valence_error,
           dv.labels = c("Interest in Learning", "Spending Time", "Similarity", 
                         'Valence'),
-          file = 'derivatives/behavioral/pre_post_anova_table_error.html')
+          file = 'derivatives/pre_post_task_survey/pre_post_anova_table_error.html')
 ```
 
 

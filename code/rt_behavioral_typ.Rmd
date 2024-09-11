@@ -300,7 +300,7 @@ rt_data_mod$Condition <- relevel(factor(rt_data_mod$Condition), ref = "SimPeer")
 
 
 ***
-# Non-Autistic Adolescents
+# Results
 
 ```{r}
 rt_data_mod_typ <- filter(rt_data_mod, group == 'non-autistic')
@@ -505,3 +505,59 @@ t.test(r4_peer_diff_typ$pos_neg_RT, alternative = "two.sided", var.equal = FALSE
 
 
 
+# Analyzing Only Learners
+
+## Pre-Post-Task Survey
+A survey was completed before the fMRI task and afterwards to gauge the participant's perceived similarity to the similar and dissimilar peer. 
+
+```{r}
+sim_learners <- read.csv('derivatives/pre_post_task_survey/participants-task-sim_learn.csv')
+
+# Remove prefix from subject IDs
+sim_learners$participant_id<-gsub("sub-SCN","SCN_",as.character(sim_learners$participant_id))
+
+head(sim_learners)
+```
+
+Filter for participants who learned the similar peer
+```{r}
+rt_data_mod_typ_sim_learn <-  filter(rt_data_mod_typ, 
+                                     rt_data_mod_typ$participant_id %in% sim_learners$participant_id)
+
+head(rt_data_mod_typ_sim_learn)
+```
+
+
+
+```{r}
+model_run_peer_typ_sim_learn <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run*Condition | participant_id),
+                       data = rt_data_mod_typ_sim_learn)
+summary(model_run_peer_typ_sim_learn)
+```
+
+
+```{r}
+ggplot(data = rt_data_mod_typ_sim_learn, aes(x=factor(Run), y=Correct_RT_logz, 
+                                             fill=Condition)) + 
+  geom_boxplot(outlier.shape = NA) + 
+  geom_point(alpha=0.05, aes(fill=Condition),
+             position = position_jitterdodge(dodge.width = 0.8)) +
+  theme_classic()
+```
+
+
+```{r}
+rt_data_mod_typ_sim_learn_means <- aggregate(Correct_RT_logz ~ participant_id * Run * Condition, rt_data_mod_typ_sim_learn, mean)
+
+rt_data_mod_typ_sim_learn_means$Condition <- factor(rt_data_mod_typ_sim_learn_means$Condition, 
+                                          levels=c('SimPeer', 'DisPeer', 'Computer'))
+
+ggplot(data=rt_data_mod_typ_sim_learn_means, aes(x=factor(Run), y=Correct_RT_logz, 
+                                       group=Condition, color=Condition)) + 
+  geom_smooth(method='lm') + 
+  geom_jitter(alpha=0.2) + 
+  scale_color_manual(values=c('#1f77b4', '#ff7f0e', '#2ca02c'),
+                     labels=c('Similar Peer', 'Dissimilar Peer', 'Computer')) + 
+  theme_classic()
+
+```
