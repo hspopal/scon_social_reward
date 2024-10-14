@@ -45,7 +45,7 @@ echo "------------------------------------------------------------------"
 #
 # 
 #
-#export SINGULARITYENV_TEMPLATEFLOW_HOME=/templateflow
+export SINGULARITYENV_TEMPLATEFLOW_HOME=/data/software-research/hpopal/SCN/fmriprep/templateflow
 #
 /data/software-research/software/apptainer/bin/singularity run --cleanenv \
     -B /data/software-research/${uname}/SCN/fmriprep:/data \

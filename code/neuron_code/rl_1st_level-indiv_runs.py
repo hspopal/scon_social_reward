@@ -27,11 +27,11 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 ##########################################################################
 
 # Take script inputs
-#subj = 'sub-SCN'+str(sys.argv[1])
+subj = 'sub-SCN'+str(sys.argv[1])
 task = 'SR'
 
 # For beta testings
-subj = 'sub-SCN101'
+#subj = 'sub-SCN101'
 #task = 'social'
 
 # Define fmriprep template space

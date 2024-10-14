@@ -36,12 +36,12 @@ bids_dir = '/data/neuron/SCN/SR/'
 os.chdir(bids_dir)
 
 # Set output directory
-data_dir = bids_dir + 'derivatives/rl_modeling/' + subj + '/'
-#outp_dir = bids_dir + 'derivatives/SR_first_level/' + 'sub-' + subj + '/'
+data_dir = bids_dir + 'derivatives/task_socialreward/data/' + subj + '/'
+outp_dir = bids_dir + 'derivatives/rl_modeling/' + 'sub-' + subj + '/'
 
 # If subject directory does not exist in output directory, create it
-#if not os.path.exists(outp_dir):
-#    os.makedirs(outp_dir)
+if not os.path.exists(data_dir):
+    os.makedirs(data_dir)
     
 ##########################################################################
 # Set scan specific paramters
@@ -152,7 +152,7 @@ for n_run in range(len(task_outp_files)):
     
     # Export events file
     event_file_name = 'sub-'+subj.replace('_','')+'_task-'+task+'_run-'+run_str+'_desc-events'
-    events.to_csv(data_dir + event_file_name + '.csv', index=False)
+    events.to_csv(outp_dir + event_file_name + '.csv', index=False)
 
     
 
