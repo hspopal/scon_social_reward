@@ -90,6 +90,8 @@ function download_data ()
 {
 sub=$1
 echo Downloading $1
+
+# Path for project data on MNC servers
 scp -r ${uname}@fmri2.umd.edu:"${SCN}"/${sub}/ $dicom_dir
 }
 
