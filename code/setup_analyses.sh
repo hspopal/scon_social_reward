@@ -20,6 +20,20 @@ subj_list=(  101 102 103 104 105 106 107 108 109 110
              253 256 261 263 264 267 268 272 275 277 
              278 283 287)
 
+subj_list = ( 101 102 103 104 105 106 107 108 110 112 
+              117 118 119 120 121 122 123 124 125 126 
+              127 128 129 133 134 135 141 142 143 144 
+              145 147 151 152 154 155 157 158 159 160 
+              164 165 168 169 171 172 173 177 181 182 
+              183 184 185 186 187 189 190 195 196 197 
+              198 199 200 204 207 208 210 214 215 216 
+              217 220 221 222 223 224 225 226 227 228 
+              231 232 233 234 235 236 238 239 241 242 
+              244 246 249 250 251 252 253 256 261 263 
+              264 266 267 268 271 272 275 277 278 283 
+              287 285 289 286 265 295 300 301 307 309 
+              315 306 305 310 323 316 109 149 201 237 )
+
 #subj_list=$(tail -n +2 participants.tsv | awk '{print $1}')
 
 
@@ -102,6 +116,43 @@ fslmaths derivatives/social_doors/sub-SCN010/suit/tmap_social_facesVoutcm_suit.n
 
 
 
+##########################################################################
+# Reinforcement Learning
+##########################################################################
+
+# Model fitting
+subj_list=( 101 102 103 104 105 106 107 108 109 110 )
+subj_list=( 112 117 118 119 120 121 122 123 124 125 )
+subj_list=( 126 127 128 129 133 134 135 141 142 143 )
+subj_list=( 144 145 147 149 151 152 154 155 157 158 )
+subj_list=( 159 160 164 165 168 169 171 172 173 177 )
+subj_list=( 181 182 183 184 185 186 187 189 190 195 )
+subj_list=( 196 197 198 199 200 201 204 207 208 210 )
+subj_list=( 214 215 216 217 220 221 222 223 224 225 )
+subj_list=( 226 227 228 231 232 233 234 235 236 237 ) 
+subj_list=( 238 239 241 242 244 246 249 250 251 252 )
+subj_list=( 253 256 261 263 264 267 268 272 275 277 278 283 287)
+
+for subj in "${subj_list[@]}"; do 
+    python code/hpopal/rl_modeling_fitting.py $subj
+done
+
+for inter in $(seq 0 20); do
+    sbatch --export=subID=101,i=${inter} \
+           --output=derivatives/logs/model_fit_sub-SCN"$subID".log \
+           code/slurm_model_fit.sh 
+done
+
+for subj in "${subj_list[@]}"; do 
+    sbatch --export=subID=101,i=1 \
+    --output=derivatives/logs/model_fit_sub-SCN"$subID".log \
+    code/slurm_model_fit.sh 
+done
+
+for subj in "${subj_list[@]}"; do 
+    #mkdir derivatives/fmriprep/sub-SCN${subj}
+    mkdir derivatives/fmriprep/sub-SCN${subj}
+done
 
 
 

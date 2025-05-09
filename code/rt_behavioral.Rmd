@@ -161,7 +161,7 @@ head(rt_data)
 
 ## Demographic info
 ```{r}
-demo_info <- read.csv('misc/SCONNChildPacket-IdentifyingInfo_DATA_2024-05-13_1121.csv')
+demo_info <- read.csv('misc/SCONNChildPacket-IdentifyingInfo_DATA_2024-10-18_1220.csv')
 demo_info <- demo_info[demo_info$redcap_event_name == 'time_1_arm_1', ]
 demo_info$record_id <- toupper(demo_info$record_id)
 
@@ -329,7 +329,7 @@ The box plots show this significant tread, and the individual response times for
 Next, we will examine whether there are differences in reaction time to our peer conditions throughout the task. Again, the conditions were were getting feedback from a similar peer (75% positive feedback), dissimilar peer (25% positive feedback), or a random computer (50% positive feedback).
 
 ```{r}
-model_run_peer_typ <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run*Condition | participant_id),
+model_run_peer_typ <- lmer(Correct_RT_logz ~ Run*Condition + age + (1 + Run*Condition | participant_id),
                        data = rt_data_mod_typ)
 summary(model_run_peer_typ)
 ```
@@ -712,7 +712,7 @@ print(paste("There are ",length(unique(rt_data_mod_asd$participant_id)),
 ```
 
 ```{r}
-model_run_peer_asd <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run | participant_id), data = rt_data_mod_asd)
+model_run_peer_asd <- lmer(Correct_RT_logz ~ Run*Condition + (1 + Run*Condition | participant_id), data = rt_data_mod_asd)
 summary(model_run_peer_asd)
 ```
 In autistic adolescents, there are no significant main effects or interactions.
@@ -733,8 +733,29 @@ ggplot(data = rt_data_mod_asd, aes(x=factor(Run), y=Correct_RT_logz,
 ```
 
 
+```{r}
+rt_data_mod_asd_means <- aggregate(Correct_RT_logz ~ participant_id * Run * Condition, rt_data_mod_asd, mean)
+
+rt_data_mod_asd_means$Condition <- factor(rt_data_mod_asd_means$Condition, 
+                                          levels=c('SimPeer', 'DisPeer', 'Computer'))
+
+ggplot(data=rt_data_mod_asd_means, aes(x=factor(Run), y=Correct_RT_logz, 
+                                       group=Condition, color=Condition)) + 
+  geom_smooth(method='lm') + 
+  geom_jitter(alpha=0.2) + 
+  scale_color_manual(values=c('#1f77b4', '#ff7f0e', '#2ca02c'),
+                     labels=c('Similar Peer', 'Dissimilar Peer', 'Computer')) + 
+  theme_classic()
+
+```
+
+
 ## Autistic vs Non-Autistic
 
 In this analysis, we will examine specific contrasts between autistic and non-autistic adolescents. For example, we will test whether there are any group differences in reaction times for similar peers and the computer condition, throughout the task. 
 
 
+```{r}
+model_run_peer_group <- lmer(Correct_RT_logz ~ Run*Condition*group + (1 + Run | participant_id), data = rt_data_mod)
+summary(model_run_peer_group)
+```
