@@ -149,14 +149,14 @@ for inter in $(seq 0 20); do
     subID=102
     if [ -z "$JOBID" ]; then
         JOBID=$(sbatch --export=subID="$subID",i=${inter} \
-           --job-name=fit-"$subID"-${inter} \
+           --job-name=fit-"$subID" \
            --output=derivatives/logs/model_fit_sub-SCN"$subID"_inter-"$inter".log \
            code/slurm_model_fit.sh | awk '{print $4}')
            sleep 10s
     else
         JOBID=$(sbatch --dependency=afterok:$JOBID \
            --export=subID="$subID",i=${inter} \
-           --job-name=fit-"$subID"-${inter} \
+           --job-name=fit-"$subID" \
            --output=derivatives/logs/model_fit_sub-SCN"$subID"_inter-"$inter".log \
            code/slurm_model_fit.sh | awk '{print $4}')
     fi
