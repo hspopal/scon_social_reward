@@ -3,7 +3,7 @@
 #SBATCH --nodes=1                    ### Number of Nodes
 #SBATCH --ntasks=1                   ### Number of Tasks
 #SBATCH --cpus-per-task=1            ### Number of Tasks per CPU
-#SBATCH --mem=100000
+#SBATCH --mem=1000
 #SBATCH --mail-type=ALL
 #SBATCH --array=0-441%80            ### Only run 80 processes at a time
 #

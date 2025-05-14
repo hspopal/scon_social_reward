@@ -3,7 +3,7 @@
 #SBATCH --nodes=1                    ### Number of Nodes
 #SBATCH --ntasks=1                   ### Number of Tasks
 #SBATCH --cpus-per-task=1            ### Number of Tasks per CPU
-#SBATCH --mem=100000
+#SBATCH --mem=1000
 #SBATCH --mail-type=ALL
 #SBATCH --array=0-441%80            ### Only run 80 processes at a time
 #
@@ -33,5 +33,5 @@ j=${SLURM_ARRAY_TASK_ID}
 intercept=${i}
 
 
-python code/rl_modeling_fitting.py -p $subID -a $(bc <<< 'scale=2; '$alpha'/20') -b $(bc <<< 'scale=2; '$beta'/20') -i $(bc <<< 'scale=2; '$intercept'/20')
+python code/rl_parameter_recovery.py -p $subID -a $(bc <<< 'scale=2; '$alpha'/20') -b $(bc <<< 'scale=2; '$beta'/20') -i $(bc <<< 'scale=2; '$intercept'/20')
 

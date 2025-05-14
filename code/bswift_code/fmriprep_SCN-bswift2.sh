@@ -47,7 +47,7 @@ echo "------------------------------------------------------------------"
 #
 export SINGULARITYENV_TEMPLATEFLOW_HOME=/data/software-research/hpopal/SCN/fmriprep/templateflow
 #
-/data/software-research/software/apptainer/bin/singularity run --cleanenv \
+/data/software-research/software/apptainer/bin/singularity run --no-home --cleanenv \
     -B /data/software-research/${uname}/SCN/fmriprep:/data \
     /data/software-research/hpopal/fmriprep-20.2.6.simg \
     /data/BIDS /data/out participant \
