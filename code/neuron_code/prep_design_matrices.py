@@ -37,7 +37,7 @@ os.chdir(bids_dir)
 
 # Set output directory
 data_dir = bids_dir + 'derivatives/task_socialreward/data/' + subj + '/'
-#outp_dir = bids_dir + 'derivatives/SR_first_level/' + 'sub-' + subj + '/'
+outp_dir = bids_dir + 'derivatives/SR_univariate/' + 'sub-SCN' + str(sys.argv[1]) + '/'
 
 # If subject directory does not exist in output directory, create it
 #if not os.path.exists(outp_dir):
@@ -120,7 +120,7 @@ for n_run in range(len(task_outp_files)):
     events.to_csv(data_dir + event_file_name + '.csv')
 
     
-    """
+    
     # Set up confounds
     confounds_files = glob.glob(os.path.join(bids_dir, 
                                 'derivatives','fmriprep', 'sub-SCN101',
@@ -148,7 +148,7 @@ for n_run in range(len(task_outp_files)):
     
     plot_design_matrix(design_matrix)
     plt.savefig(outp_dir + dm_name + '.png')
-    """
+    
 
 
 

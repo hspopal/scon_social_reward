@@ -144,10 +144,55 @@ for inter in $(seq 0 20); do
            code/slurm_model_fit.sh 
 done
 
-sbatch --export=subID=101,i=0 \
+JOBID=""
+for inter in $(seq 0 20); do
+    subID=102
+    if [ -z "$JOBID" ]; then
+        JOBID=$(sbatch --export=subID="$subID",i=${inter} \
+           --job-name=fit-"$subID"-${inter} \
+           --output=derivatives/logs/model_fit_sub-SCN"$subID"_inter-"$inter".log \
+           code/slurm_model_fit.sh | awk '{print $4}')
+           sleep 10s
+    else
+        JOBID=$(sbatch --dependency=afterok:$JOBID \
+           --export=subID="$subID",i=${inter} \
+           --job-name=fit-"$subID"-${inter} \
+           --output=derivatives/logs/model_fit_sub-SCN"$subID"_inter-"$inter".log \
+           code/slurm_model_fit.sh | awk '{print $4}')
+    fi
+    echo "Submitted "$subID" with intercept $inter as job $JOBID"
+done
+
+sbatch --export=subID=102,i=0 \
+           --job-name=rcv-101 \
+           --output=derivatives/logs/parameter_recovery_sub-SCN101.log \
+           code/slurm_model_fit.sh 
+
+
+JOBID=""
+for inter in $(seq 0 20); do
+    subID=101
+    if [ -z "$JOBID" ]; then
+        JOBID=$(sbatch --export=subID="$subID",i=${inter} \
+           --job-name=fit-"$subID"-"$inter" \
+           --output=derivatives/logs/model_fit_sub-SCN"$subID"_inter-"$inter".log \
+           code/slurm_model_fit.sh | awk '{print $4}')
+    else
+        JOBID=$(sbatch --dependency=afterok:$JOBID \
+           --export=subID="$subID",i=${inter} \
+           --job-name=rcv-"$subID"-"$inter" \
+           --output=derivatives/logs/parameter_recovery_sub-SCN"$subID"_inter-"$inter".log \
+           code/slurm_parameter_recovery.sh | awk '{print $4}')
+    fi
+    echo "Submitted "$subID" with intercept $inter as job $JOBID"
+done
+
+sbatch --export=subID=102,i=0 \
            --job-name=rcv-101 \
            --output=derivatives/logs/parameter_recovery_sub-SCN101.log \
            code/slurm_parameter_recovery.sh 
+
+
 
 
 for subj in "${subj_list[@]}"; do 

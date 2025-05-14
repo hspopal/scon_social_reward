@@ -24,11 +24,15 @@ warnings.filterwarnings("ignore")
 ##########################################################################
 
 # Take script inputs
-subj = 'SCN_'+str(sys.argv[1])
+#subj = 'SCN_'+str(sys.argv[1])
 #task = 'SR'
 
+subj_num = str(sys.argv[1])
+
 # For beta testings
-#subj = 'SCN_215'
+#subj_num = '101'
+subj_id_raw = 'SCN_'+subj_num
+subj_id_bids = 'sub-SCN'+subj_num
 task = 'SR'
 
 # Set BIDS project directory
@@ -36,8 +40,8 @@ bids_dir = '/data/neuron/SCN/SR/'
 os.chdir(bids_dir)
 
 # Set output directory
-data_dir = bids_dir + 'derivatives/task_socialreward/data/' + subj + '/'
-outp_dir = bids_dir + 'derivatives/rl_modeling/' + 'sub-' + subj + '/'
+data_dir = bids_dir + 'derivatives/rl_modeling/event_files/' + subj_id_raw + '/'
+outp_dir = bids_dir + 'derivatives/rl_modeling/' + subj_id_bids + '/'
 
 # If subject directory does not exist in output directory, create it
 if not os.path.exists(data_dir):
@@ -65,15 +69,18 @@ task_outp_files = glob.glob(data_dir+'*-errors.csv')
 for n_run in range(len(task_outp_files)):
     # Find run number
     run_str = task_outp_files[n_run].split('-errors.csv')[0][-1]
-    
+    rl_outp_file = glob.glob(bids_dir+'derivatives/rl_modeling/subject_model_fits/'+subj_id_bids+'/*Model 4*run-'+run_str+'.csv')[0]
+
     
     task_outp = pd.read_csv(task_outp_files[n_run])
+    rl_outp = pd.read_csv(rl_outp_file)
     
     # Filter for relevant columns
     task_outp_fltr = task_outp[['ConditionName', 'ItemStart', 'ItemDur',
-                                'FirstButtonPressTime',
+                                'ParticipantsFirstAnswer', 'FirstButtonPressTime',
                                 'FeedbackStart', 'FeedbackDur', 'Correct_RT', 
-                                'redcap_v_task', 'RPE']]
+                                'redcap_v_task']]
+    task_outp_fltr['RPE'] = rl_outp['RPE'].copy()
     
     # Create the events dataframe with the appropriate columns
     decision_trials = [list(task_outp_fltr['ConditionName']),
@@ -83,15 +90,16 @@ for n_run in range(len(task_outp_files)):
     decision_df = pd.DataFrame(np.array(decision_trials).T, 
                           columns=['trial_type', 'onset', 'duration'])
     
-    response_trials = [len(list(task_outp_fltr['FirstButtonPressTime'])) * ['ButtonPress'],
+    response_trials = [list(task_outp_fltr['ParticipantsFirstAnswer']),
                        list(task_outp_fltr['FirstButtonPressTime']),
-                       len(list(task_outp_fltr['FirstButtonPressTime'])) * [0.1]]
+                       len(list(task_outp_fltr['FirstButtonPressTime'])) * [0]]
     
     response_df = pd.DataFrame(np.array(response_trials).T, 
                           columns=['trial_type', 'onset', 'duration'])
     
     # Remove trials with no button press
     response_df = response_df[~response_df['onset'].str.contains('nan')]
+    response_df = response_df[~response_df['trial_type'].str.contains('nan')]
     
     feedback_trials = [list(task_outp_fltr['ConditionName']+'-fb'), 
                        list(task_outp_fltr['FeedbackStart']),
@@ -150,9 +158,12 @@ for n_run in range(len(task_outp_files)):
     #events['error'] = events['error'].fillna(0)
     events['RPE'] = events['RPE'].fillna(0)
     
+    # Create a duration for button presses
+    events.loc[events['trial_type'] == 'ButtonPress', 'duration'] = 0.1
+    
     # Export events file
-    event_file_name = 'sub-'+subj.replace('_','')+'_task-'+task+'_run-'+run_str+'_desc-events'
-    events.to_csv(outp_dir + event_file_name + '.csv', index=False)
+    event_file_name = subj_id_bids+'_task-'+task+'_run-'+run_str+'_desc-events'
+    events.to_csv(data_dir + event_file_name + '.csv', index=False)
 
     
 

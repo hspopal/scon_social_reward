@@ -254,7 +254,7 @@ for model_name in models_dict.keys():
     n_row += 1
 
     model_str = model_name.split(':')[0].replace(" ", "-")
-    model_fit_results.to_csv(outp_dir+'/'+'sub-SCN'+subj_id+'_a-'+str(alpha_guess)+'_b-'+str(beta_guess)+'_i-'+str(inter_guess)+'_fit_results.csv', 
+    model_rec_results.to_csv(outp_dir+'/'+'sub-SCN'+subj_id+'_a-'+str(alpha_guess)+'_b-'+str(beta_guess)+'_i-'+str(inter_guess)+'_rcv_results.csv', 
                              index=False)
 
 

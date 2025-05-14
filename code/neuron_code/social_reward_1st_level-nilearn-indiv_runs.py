@@ -24,11 +24,11 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 ##########################################################################
 
 # Take script inputs
-subj = 'sub-SCN'+str(sys.argv[1])
+#subj = 'sub-SCN'+str(sys.argv[1])
 task = 'SR'
 
 # For beta testings
-#subj = 'sub-SCN101'
+subj = 'sub-SCN101'
 #task = 'social'
 
 # Define fmriprep template space
@@ -62,7 +62,8 @@ if not os.path.exists(outp_dir):
     os.makedirs(outp_dir)
 
 # Find QC data for participant
-qc_data = pd.read_csv(os.path.join(bids_dir, 'derivatives', 'participants_good.csv'))
+qc_data = pd.read_csv(os.path.join(bids_dir, 'derivatives', 
+                                   'participants-qc-min_task_errors.csv'))
 
 # Filter for only participant QC data
 subj_qc_data = qc_data[qc_data['participant_id'] == subj]
@@ -264,7 +265,11 @@ contrasts_dict = {'all_pVc_f':[['pos_ps_f','neg_ps_f','pos_pd_f','neg_pd_f'],
                   'all_pdVc_i':[['pos_pd_i','neg_pd_i'],
                                 ['pos_c_i','neg_c_i']],
                   'all_psVpd_i':[['pos_ps_i','neg_ps_i'],
-                                 ['pos_pd_i','neg_pd_i']]
+                                 ['pos_pd_i','neg_pd_i']],
+                  'all_a_iVf':[['pos_ps_i','neg_ps_i','pos_pd_i','neg_pd_i',
+                                'pos_c_i','neg_c_i'], 
+                               ['pos_ps_f','neg_ps_f','pos_pd_f','neg_pd_f',
+                                             'pos_c_f','neg_c_f']]
                   }
 
 
