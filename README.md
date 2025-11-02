@@ -41,6 +41,18 @@ Contributors: Haroon Popal, Elizabeth Redcay, Victoria Alleluia Shenge
     - This script creates beta maps for each condition, for each run, and averaged together (each condition for each participant)
 
 
+## Behavioral Analyses
+- [`rt_modeling.ipynb`](https://github.com/hspopal/scon_social_reward/blob/main/code/rt_modeling.ipynb)
+  - Reaction time analyses for each run and between groups
+
+
 ## Reinforcement Learning
 ### Behavioral Data Modeling
-Run `social_reward_modeling.ipynb`
+- [`social_reward_modeling.ipynb`](https://github.com/hspopal/scon_social_reward/blob/main/code/social_reward_modeling.ipynb)
+  - Walkthrough of the social RL models and modeling steps
+  - Does not actually produce the modeling results, but shows visualizations of the model hypotheses and the modeling steps
+- [`rl_modeling_results.ipynb`](https://github.com/hspopal/scon_social_reward/blob/main/code/rl_modeling_results.ipynb)
+  - Combines model fit and parameter recovery results for each participant
+- [`model_simulations.ipynb`](https://github.com/hspopal/scon_social_reward/blob/main/code/model_simulations.ipynb)
+  - Gives descriptions of the different model hypotheses and visualizations of their hypothesized performances
+
