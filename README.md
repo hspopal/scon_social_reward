@@ -10,7 +10,7 @@ Contributors: Haroon Popal, Elizabeth Redcay, Victoria Alleluia Shenge
   - This notebook examines each participants data, and produces:
     - A spreadsheet for the number of errors for each participant - `answer_errors_sum.csv`
     - A duplicate of the task output files, for each participant, for each run, with a column indicating whether the trial was "wrong" or not (this can be used as a regressor in the first level fMRI analysis)
-- [`prep_participants_lists.ipynb`](https://github.com/hspopal/scon_social_reward/blob/main/code/prep_participants_lists.ipynb)
+- [`MRI-QC_summary.ipynb`](https://github.com/hspopal/scon_social_reward/blob/main/code/MRI-QC_summary.ipynb)
   - Combines participant metadata from various sources (e.g. MRI QC, demographics) and outputs a series of TSV or CSVs which can be used as participant lists
   - This allows you to know which participants to use in analyses, and how that list was created, in a transparent manner
   - Output:
