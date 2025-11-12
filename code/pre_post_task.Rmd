@@ -14,7 +14,7 @@ output:
 ---
 
 ```{r, setup, include=FALSE}
-proj_dir <- '/Users/hpopal/Google Drive/My Drive/dscn_lab/projects/scon_social_reward/'
+proj_dir <- '/Users/haroonpopal//hpopal@umd.edu - Google Drive/My Drive/dscn_lab/projects/scon_social_reward/'
 
 knitr::opts_knit$set(root.dir = proj_dir)
 ```
@@ -106,6 +106,9 @@ for (subj in pre_post_data$record_id) {
 
 # Remove missing data
 pre_post_data <- pre_post_data[pre_post_data$simpeer != '',]
+
+print(paste("Number of participants with complete data: ",nrow(pre_post_data), 
+            sep=""))
 ```
 
 
