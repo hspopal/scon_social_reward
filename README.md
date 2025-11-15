@@ -42,6 +42,8 @@ Contributors: Haroon Popal, Elizabeth Redcay, Victoria Alleluia Shenge
 
 
 ## Behavioral Analyses
+- [pre_post_task.Rmd](https://hspopal.github.io/scon_social_reward/code/pre_post_task.html)
+  - Analyze the pre and post social reward task survey
 - [`rt_modeling.ipynb`](https://github.com/hspopal/scon_social_reward/blob/main/code/rt_modeling.ipynb)
   - Reaction time analyses for each run and between groups
 
