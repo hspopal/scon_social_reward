@@ -7,32 +7,24 @@
 export BIDS_DIR="/data/neuron/SCN/SR"
 cd ${BIDS_DIR}
 
-subj_list=(  101 102 103 104 105 106 107 108 109 110 
-             112 117 118 119 120 121 122 123 124 125 
-             126 127 128 129 133 134 135 141 142 143 
-             144 145 147 149 151 152 154 155 157 158 
-             159 160 164 165 168 169 171 172 173 177 
-             181 182 183 184 185 186 187 189 190 195 
-             196 197 198 199 200 201 204 207 208 210 
-             214 215 216 217 220 221 222 223 224 225 
-             226 227 228 231 232 233 234 235 236 237 
-             238 239 241 242 244 246 249 250 251 252 
-             253 256 261 263 264 267 268 272 275 277 
-             278 283 287)
+subj_list=( 101 102 103 104 105 106 107 108 109 110 
+            112 113 117 118 119 120 121 122 123 124 
+            125 126 127 128 129 133 134 135 138 141 
+            142 143 144 145 146 147 149 151 152 154 
+            155 157 158 159 160 164 165 168 169 171 
+            172 173 177 181 182 183 184 185 186 187 
+            188 189 190 194 195 196 197 198 199 200 
+            201 204 205 206 207 208 209 210 214 215 
+            216 217 218 219 220 221 222 223 224 225 
+            226 227 228 229 231 232 233 234 235 236 
+            237 238 239 241 242 244 246 248 249 250 
+            251 252 253 254 255 256 258 261 262 263 
+            264 265 266 267 268 271 272 275 276 277 
+            278 283 284 285 286 287 289 290 293 294 
+            295 299 300 301 303 305 306 307 308 309 
+            310 311 312 315 316 317 319 320 323 324 
+            325 326 328 329 )
 
-subj_list = ( 101 102 103 104 105 106 107 108 110 112 
-              117 118 119 120 121 122 123 124 125 126 
-              127 128 129 133 134 135 141 142 143 144 
-              145 147 151 152 154 155 157 158 159 160 
-              164 165 168 169 171 172 173 177 181 182 
-              183 184 185 186 187 189 190 195 196 197 
-              198 199 200 204 207 208 210 214 215 216 
-              217 220 221 222 223 224 225 226 227 228 
-              231 232 233 234 235 236 238 239 241 242 
-              244 246 249 250 251 252 253 256 261 263 
-              264 266 267 268 271 272 275 277 278 283 
-              287 285 289 286 265 295 300 301 307 309 
-              315 306 305 310 323 316 109 149 201 237 )
 
 #subj_list=$(tail -n +2 participants.tsv | awk '{print $1}')
 
@@ -40,10 +32,12 @@ subj_list = ( 101 102 103 104 105 106 107 108 110 112
 
 
 # Create event files for first level design matrices
+# conda py310 environment
 for subj in "${subj_list[@]}"; do 
     python code/hpopal/prep_event_files.py $subj
 done
 
+# Got errors
 for subj in "${subj_list[@]}"; do 
     python code/hpopal/prep_event_files-rl.py $subj
 done
@@ -52,6 +46,16 @@ done
 for subj in "${subj_list[@]}"; do 
     python code/hpopal/create_gm_brain_mask.py $subj
 done
+
+# Transfer gm mask to local machine
+for subj in "${subj_list[@]}"; do 
+    if [! -e derivatives/fmriprep/subj-SCN${subj} ]; then
+        mkdir derivatives/fmriprep/subj-SCN${subj}
+        mkdir derivatives/fmriprep/subj-SCN${subj}/anat
+    fi
+    scp hpopal@neuron.umd.edu:/data/neuron/SCN/SR/derivatives/fmriprep/sub-SCN${subj}/anat/sub-SCN${subj}_space-MNIPediatricAsym_cohort-5_res-2_label-GM_probseg_bin.nii.gz derivaitves/fmriprep/sub-SCN${subj}/anat/
+done
+
 
 
 # Run first level analysis
@@ -121,17 +125,16 @@ fslmaths derivatives/social_doors/sub-SCN010/suit/tmap_social_facesVoutcm_suit.n
 ##########################################################################
 
 # Model fitting
-subj_list=( 101 102 103 104 105 106 107 108 109 110 )
-subj_list=( 112 117 118 119 120 121 122 123 124 125 )
-subj_list=( 126 127 128 129 133 134 135 141 142 143 )
-subj_list=( 144 145 147 149 151 152 154 155 157 158 )
-subj_list=( 159 160 164 165 168 169 171 172 173 177 )
-subj_list=( 181 182 183 184 185 186 187 189 190 195 )
-subj_list=( 196 197 198 199 200 201 204 207 208 210 )
-subj_list=( 214 215 216 217 220 221 222 223 224 225 )
-subj_list=( 226 227 228 231 232 233 234 235 236 237 ) 
-subj_list=( 238 239 241 242 244 246 249 250 251 252 )
-subj_list=( 253 256 261 263 264 267 268 272 275 277 278 283 287)
+subj_list=( 284 285 286 289 290 293 294  )
+subj_list=( 295 299 300 301 303 305 306 307 308 309 )
+subj_list=( 310 311 312 315 316 317 319 )
+subj_list=( 325 326 328 329 320 323 324 )
+
+
+
+             
+            
+             )
 
 for subj in "${subj_list[@]}"; do 
     python code/hpopal/rl_modeling_fitting.py $subj
