@@ -39,6 +39,9 @@ Contributors: Haroon Popal, Elizabeth Redcay, Victoria Alleluia Shenge
     - Run the first level analysis for each participant, for the social reward task
     - First level here refers to creating whole-brain beta maps for each participant
     - This script creates beta maps for each condition, for each run, and averaged together (each condition for each participant)
+- [`social_reward_2nd_lebel-nilearn.ipynb`](https://github.com/hspopal/scon_social_reward/blob/main/code/neuron_code/social_reward_2nd_level-nilearn.ipynb)
+  - Group level analyses for the social reward task
+  - Includes contrasts for positive feedback similar peer > computer and prompt phase similar peer > dissimilar peer for the neurotypical, autistic, and neurotypical vs autistic group comparisons
 
 
 ## Behavioral Analyses
